@@ -56,6 +56,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     toast.success("Notificações marcadas como lidas.");
   };
 
+  const handleEnableNotifications = async () => {
+    if (typeof window === 'undefined') return;
+
+    if (!('Notification' in window)) {
+      toast.error('Este navegador não suporta notificações.');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        toast.success('Notificações autorizadas!');
+        
+        // Register service worker if supported
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.register('/sw.js');
+          console.log('Service Worker registrado com sucesso:', registration);
+          toast.success('Dispositivo ativado para receber alertas.');
+        }
+      } else if (permission === 'denied') {
+        toast.error('Permissão de notificações recusada.');
+      }
+    } catch (error) {
+      console.error('Erro ao registrar notificações:', error);
+      toast.error('Erro ao ativar notificações.');
+    }
+  };
+
   const handleSendFeedback = () => {
     if (!feedbackText.trim()) {
       toast.error("Por favor, descreva seu feedback ou sugestão.");
@@ -689,8 +717,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               ))}
             </div>
 
+            {/* PWA Notification Opt-in */}
+            <div className="w-full mt-4">
+              <button
+                onClick={handleEnableNotifications}
+                className="w-full py-3 px-4 bg-emerald-550/[0.08] hover:bg-emerald-550/[0.12] active:bg-emerald-550/[0.18] dark:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12] border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-xs"
+              >
+                Ativar Notificações no Celular
+              </button>
+            </div>
+
             {/* Close Button */}
-            <div className="w-full mt-6 flex">
+            <div className="w-full mt-3 flex">
               <button
                 onClick={() => setIsNotificationsOpen(false)}
                 className="w-full py-3 px-4 bg-zinc-950 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-900 font-semibold rounded-2xl transition-all text-sm shadow-md cursor-pointer text-center focus:outline-none"
