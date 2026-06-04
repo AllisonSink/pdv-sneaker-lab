@@ -660,9 +660,9 @@ export default function PDVPage() {
                   placeholder="Escaneie o código de barras ou digite o modelo do tênis..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-50/10 focus:border-zinc-900 dark:focus:border-zinc-50 transition-all shadow-sm placeholder-zinc-400 dark:placeholder-zinc-600"
+                  className="w-full pl-11 pr-4 md:pr-12 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-50/10 focus:border-zinc-900 dark:focus:border-zinc-50 transition-all shadow-sm placeholder-zinc-400 dark:placeholder-zinc-600"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-zinc-400">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1.5 text-zinc-400">
                   <Barcode className="w-5 h-5 animate-pulse" />
                   <span className="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-mono hidden md:inline">BIP</span>
                 </div>
