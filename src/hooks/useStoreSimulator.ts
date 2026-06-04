@@ -2,11 +2,17 @@ import { useEffect, useRef } from 'react';
 import { Sale, Product, TeamMember, PaymentMethod, CartItem } from '@/types';
 import { toast } from 'sonner';
 
-export function useStoreSimulator() {
+export function useStoreSimulator(isEnabled: boolean) {
   const isRunningRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    if (!isEnabled) {
+      console.log('Background store simulator is paused.');
+      isRunningRef.current = false;
+      return;
+    }
 
     // Avoid duplicate intervals in React 18 Strict Mode or layout re-mounts
     if (isRunningRef.current) return;
@@ -282,5 +288,5 @@ export function useStoreSimulator() {
       isRunningRef.current = false;
       console.log('Background store simulator cleaned up.');
     };
-  }, []);
+  }, [isEnabled]);
 }

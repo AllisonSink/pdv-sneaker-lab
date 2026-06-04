@@ -31,7 +31,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   // Run the background event simulator
-  useStoreSimulator();
+  const [isPushEnabled, setIsPushEnabled] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem('sneaker_pos_push_enabled');
+        return saved ? JSON.parse(saved) : false;
+      }
+    } catch (e) {
+      console.warn('Failed to load push state:', e);
+    }
+    return false;
+  });
+
+  useStoreSimulator(isPushEnabled);
 
   // Profile Customization states
   const [profileName, setProfileName] = useState('');
@@ -121,12 +133,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           console.log('Service Worker registrado com sucesso:', registration);
           toast.success('Dispositivo ativado para receber alertas.');
         }
+        setIsPushEnabled(true);
+        localStorage.setItem('sneaker_pos_push_enabled', JSON.stringify(true));
       } else if (permission === 'denied') {
         toast.error('Permissão de notificações recusada.');
       }
     } catch (error) {
       console.error('Erro ao registrar notificações:', error);
       toast.error('Erro ao ativar notificações.');
+    }
+  };
+
+  const handleTogglePush = async () => {
+    if (isPushEnabled) {
+      setIsPushEnabled(false);
+      try {
+        localStorage.setItem('sneaker_pos_push_enabled', JSON.stringify(false));
+        toast.success("Notificações e simulador pausados.");
+      } catch (e) {
+        console.warn(e);
+      }
+    } else {
+      await handleEnableNotifications();
     }
   };
 
@@ -763,13 +791,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               ))}
             </div>
 
-            {/* PWA Notification Opt-in */}
+            {/* PWA Notification Opt-in Toggle */}
             <div className="w-full mt-4">
               <button
-                onClick={handleEnableNotifications}
-                className="w-full py-3 px-4 bg-emerald-550/[0.08] hover:bg-emerald-550/[0.12] active:bg-emerald-550/[0.18] dark:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12] border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-xs"
+                onClick={handleTogglePush}
+                className={`w-full py-3 px-4 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-xs ${
+                  isPushEnabled
+                    ? 'bg-red-500/[0.06] hover:bg-red-500/[0.10] active:bg-red-500/[0.15] dark:bg-red-500/[0.04] dark:hover:bg-red-500/[0.08] border border-red-500/20 dark:border-red-500/30 text-red-600 dark:text-red-400'
+                    : 'bg-emerald-550/[0.08] hover:bg-emerald-550/[0.12] active:bg-emerald-550/[0.18] dark:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12] border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                }`}
               >
-                Ativar Notificações no Celular
+                {isPushEnabled ? 'Desativar Notificações' : 'Ativar Notificações no Celular'}
               </button>
             </div>
 
