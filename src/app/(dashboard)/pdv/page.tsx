@@ -670,12 +670,15 @@ export default function PDVPage() {
 
               {/* Barcode search dropdown suggestions */}
               {searchQuery.trim().length > 0 && filteredProducts.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 z-40 max-h-60 overflow-y-auto bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl rounded-2xl p-2 backdrop-blur-xl">
+                <div className="relative sm:absolute sm:top-full left-0 right-0 w-full mt-2 z-[50] max-h-60 overflow-y-auto bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-md rounded-2xl p-2">
                   <p className="text-[10px] text-zinc-400 font-semibold px-3 py-1 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg mb-1 uppercase tracking-wider">Produtos Encontrados</p>
                   {filteredProducts.map(prod => (
                     <div 
                       key={prod.id}
-                      onClick={() => setSelectedProductForSize(prod)}
+                      onClick={() => {
+                        setSelectedProductForSize(prod);
+                        setSearchQuery('');
+                      }}
                       className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors"
                     >
                       <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/10 overflow-hidden shrink-0">
