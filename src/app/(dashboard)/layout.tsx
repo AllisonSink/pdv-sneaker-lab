@@ -22,12 +22,16 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
+import { useStoreSimulator } from '@/hooks/useStoreSimulator';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isLoading } = useAuth();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  // Run the background event simulator
+  useStoreSimulator();
 
   // Profile Customization states
   const [profileName, setProfileName] = useState('');
@@ -44,15 +48,57 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Notifications states
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Venda aprovada: R$ 1.200,00', date: 'Hoje, 14:32', unread: true },
-    { id: 2, text: 'Alerta: Air Force 1 Esgotado', date: 'Hoje, 10:15', unread: true },
-  ]);
+  const [notifications, setNotifications] = useState<{ id: number; text: string; date: string; unread: boolean }[]>([]);
+
+  // Load initial notifications from LocalStorage or seed if empty
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem('sneaker_pos_notifications');
+        if (saved) {
+          setNotifications(JSON.parse(saved));
+        } else {
+          const initialNotifications = [
+            { id: 1, text: 'Venda aprovada: R$ 1.200,00', date: 'Hoje, 14:32', unread: true },
+            { id: 2, text: 'Alerta: Air Force 1 Esgotado', date: 'Hoje, 10:15', unread: true },
+          ];
+          setNotifications(initialNotifications);
+          localStorage.setItem('sneaker_pos_notifications', JSON.stringify(initialNotifications));
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load notifications:', e);
+    }
+  }, []);
+
+  // Listen to background simulator updates to reload notifications instantly
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const saved = localStorage.getItem('sneaker_pos_notifications');
+          if (saved) {
+            setNotifications(JSON.parse(saved));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to update notifications:', e);
+      }
+    };
+    window.addEventListener('sneaker_pos_update', handleUpdate);
+    return () => window.removeEventListener('sneaker_pos_update', handleUpdate);
+  }, []);
 
   const hasUnreadNotifications = notifications.some(n => n.unread);
 
   const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    const updated = notifications.map(n => ({ ...n, unread: false }));
+    setNotifications(updated);
+    try {
+      localStorage.setItem('sneaker_pos_notifications', JSON.stringify(updated));
+    } catch (e) {
+      console.warn(e);
+    }
     toast.success("Notificações marcadas como lidas.");
   };
 

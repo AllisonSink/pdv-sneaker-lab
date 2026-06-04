@@ -249,6 +249,28 @@ export default function DashboardPage() {
     }, 0);
   }, []);
 
+  // Listen to background simulator updates to reload dashboard data in real-time
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const savedSales = localStorage.getItem('sneaker_pos_sales');
+          if (savedSales) {
+            setSales(JSON.parse(savedSales));
+          }
+          const savedProducts = localStorage.getItem('sneaker_pos_products');
+          if (savedProducts) {
+            setProducts(JSON.parse(savedProducts));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to reload dashboard stats:', e);
+      }
+    };
+    window.addEventListener('sneaker_pos_update', handleUpdate);
+    return () => window.removeEventListener('sneaker_pos_update', handleUpdate);
+  }, []);
+
   // Sync date range dynamically via useMemo (avoids set-state-in-effect issues)
   const dateRange = useMemo(() => {
     let start = new Date();

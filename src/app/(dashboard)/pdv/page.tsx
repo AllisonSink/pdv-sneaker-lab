@@ -149,6 +149,24 @@ export default function PDVPage() {
     }, 0);
   }, []);
 
+  // Listen to background simulator updates to reload products in real-time
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const savedProducts = localStorage.getItem('sneaker_pos_products');
+          if (savedProducts) {
+            setProducts(JSON.parse(savedProducts));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to reload products in PDV:', e);
+      }
+    };
+    window.addEventListener('sneaker_pos_update', handleUpdate);
+    return () => window.removeEventListener('sneaker_pos_update', handleUpdate);
+  }, []);
+
   // Update DateTime
   useEffect(() => {
     const updateDateTime = () => {
