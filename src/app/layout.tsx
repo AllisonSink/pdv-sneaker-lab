@@ -5,7 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CashRegisterProvider } from "@/context/CashRegisterContext";
 import { ExchangeCreditProvider } from "@/context/ExchangeCreditContext";
 import { TeamProvider } from "@/context/TeamContext";
-import { Toaster } from "sonner";
+import ClientToaster from "@/components/ui/ClientToaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +44,7 @@ export default function RootLayout({
             <ExchangeCreditProvider>
               <TeamProvider>
                 {children}
-                <Toaster position="bottom-right" richColors closeButton />
+                <ClientToaster />
               </TeamProvider>
             </ExchangeCreditProvider>
           </CashRegisterProvider>
