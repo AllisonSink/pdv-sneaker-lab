@@ -662,8 +662,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Date Selector */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-zinc-200/35 dark:bg-zinc-900/60 p-1 rounded-2xl flex gap-1 border border-zinc-200/20 dark:border-zinc-800/40">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <div className="bg-zinc-200/35 dark:bg-zinc-900/60 p-1 rounded-2xl flex gap-1 border border-zinc-200/20 dark:border-zinc-800/40 overflow-x-auto whitespace-nowrap hide-scrollbar max-w-full w-full sm:w-auto">
             {[
               { label: 'Hoje', value: 'today' },
               { label: 'Ontem', value: 'yesterday' },
@@ -674,7 +674,7 @@ export default function DashboardPage() {
               <button
                 key={preset.value}
                 onClick={() => setFilterType(preset.value as 'today' | 'yesterday' | '7days' | '30days' | 'custom')}
-                className={`text-[11px] px-3.5 py-1.5 rounded-xl font-medium transition-all ${
+                className={`text-[11px] px-3.5 py-1.5 rounded-xl font-medium transition-all shrink-0 ${
                   filterType === preset.value
                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm border border-zinc-200/10'
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -697,7 +697,7 @@ export default function DashboardPage() {
 
           <button
             onClick={handleExportXlsx}
-            className="flex items-center gap-2 text-[11px] px-3.5 py-1.5 rounded-xl font-medium transition-all border border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-50 active:scale-98 shadow-sm cursor-pointer"
+            className="flex items-center justify-center gap-2 text-[11px] px-3.5 py-1.5 rounded-xl font-medium transition-all border border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-50 active:scale-98 shadow-sm cursor-pointer w-full sm:w-auto"
             title="Exportar transações do período para Excel"
           >
             <Download className="w-3.5 h-3.5" />

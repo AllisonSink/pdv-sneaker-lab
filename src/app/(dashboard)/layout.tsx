@@ -499,31 +499,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
 
         {/* Page Content viewport */}
-        <div className="flex-1 flex flex-col overflow-y-auto pb-16 md:pb-0">
+        <div className="flex-1 flex flex-col overflow-y-auto pb-6 md:pb-0">
           {children}
         </div>
-      </div>
-
-      {/* Bottom Navigation Bar (Mobile only) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-200/40 dark:border-zinc-900/60 z-40 flex items-center justify-around pb-safe shadow-lg">
-        {navLinks.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors select-none ${
-                isActive 
-                  ? 'text-zinc-950 dark:text-zinc-50 font-bold' 
-                  : 'text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300'
-              }`}
-            >
-              <Icon className="w-5 h-5 shrink-0" />
-              <span className="text-[10px] mt-1 tracking-tight">{link.label}</span>
-            </Link>
-          );
-        })}
       </div>
 
       {/* Edit Profile Modal */}
