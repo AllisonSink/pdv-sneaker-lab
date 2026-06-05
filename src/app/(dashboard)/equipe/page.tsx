@@ -176,7 +176,7 @@ export default function TeamPage() {
             placeholder="Buscar membro pelo nome..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all placeholder-zinc-400"
+            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all placeholder-zinc-400"
           />
         </div>
       </div>
@@ -338,7 +338,7 @@ export default function TeamPage() {
                   placeholder="Nome do colaborador"
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-base md:text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
                 />
               </div>
 
@@ -377,7 +377,7 @@ export default function TeamPage() {
                       const val = e.target.value.replace(/\D/g, '');
                       setPinInput(val);
                     }}
-                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-base md:text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -398,7 +398,7 @@ export default function TeamPage() {
                     placeholder="Taxa de comissão (ex: 2.5)"
                     value={commissionInput}
                     onChange={(e) => setCommissionInput(e.target.value)}
-                    className="w-full pl-3.5 pr-8 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
+                    className="w-full pl-3.5 pr-8 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-250/20 dark:border-zinc-800 rounded-xl text-base md:text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-zinc-955 transition-all text-zinc-900 dark:text-white"
                   />
                 </div>
                 {/* Quick actions */}

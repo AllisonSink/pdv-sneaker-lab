@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.15",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.107.0",
     "browser-image-compression": "^2.0.2",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.17.0",

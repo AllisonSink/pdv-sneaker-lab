@@ -14,6 +14,7 @@ export interface Product {
   imageUrl: string;  // Image path or generated base64
   sizes: SizeStock[]; // Size grid containing stock and barcode
   colorway?: string; // e.g. "Triple White" or "Preto/Branco"
+  priceCost?: number; // Cost price of the item
 }
 
 export interface CartItem {

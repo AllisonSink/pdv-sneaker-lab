@@ -4,14 +4,17 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 export interface User {
+  id: string;
   username: string;
+  email?: string;
   role: 'admin' | 'seller';
+  tenant_id?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -23,95 +26,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
   const pathname = usePathname();
 
-  // Load user session from localStorage
+  // Injeção de Usuário Simulado (Bypass de Segurança)
   useEffect(() => {
-    // Safety Timeout: Force loader off after 3 seconds in case of storage blocks or hydration freezes
-    const safetyTimeout = setTimeout(() => {
-      console.warn('Authentication loading timeout exceeded. Forcing load completion.');
-      setIsLoading(false);
-    }, 3000);
-
-    let loadedUser: User | null = null;
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const savedUser = localStorage.getItem('sneaker_pos_user');
-        if (savedUser) {
-          loadedUser = JSON.parse(savedUser);
-        }
+    const storedUser = typeof window !== 'undefined' ? localStorage.getItem('mock_user') : null;
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error('Error parsing stored mock user:', e);
       }
-    } catch (e) {
-      console.warn('LocalStorage is blocked or failed to load user session:', e);
+    } else {
+      // Injeta usuário mock imediatamente para destravar o desenvolvimento visual
+      setUser({
+        id: 'mock-123',
+        email: 'admin@sneakerlab.com',
+        username: 'Admin Sneaker Lab',
+        role: 'admin',
+        tenant_id: 'mock-tenant-id'
+      });
     }
-
-    setTimeout(() => {
-      setUser(loadedUser);
-      setIsLoading(false);
-      clearTimeout(safetyTimeout);
-    }, 0);
-
-    return () => clearTimeout(safetyTimeout);
+    setIsLoading(false);
   }, []);
 
-  // Handle route protection based on auth state and role
+  // Client-side route protection
   useEffect(() => {
     if (isLoading) return;
 
-    const isPublicRoute = pathname === '/login';
+    const isPublicRoute = pathname === '/login' || pathname === '/planos' || pathname === '/';
 
     if (!user && !isPublicRoute) {
       router.replace('/login');
     } else if (user && isPublicRoute) {
-      // If logged in and trying to access login page, redirect appropriately
       if (user.role === 'admin') {
         router.replace('/dashboard');
       } else {
         router.replace('/pdv');
       }
     } else if (user && user.role === 'seller' && pathname === '/dashboard') {
-      // Prevent sellers from entering dashboard
       router.replace('/pdv');
     }
   }, [user, pathname, isLoading, router]);
 
-  const login = (username: string, password: string): boolean => {
-    // Basic mock authentication
-    if (username === 'admin' && password === 'admin') {
-      const loggedUser: User = { username: 'Dono', role: 'admin' };
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const role = email.includes('seller') ? 'seller' : 'admin';
+      const loggedUser: User = {
+        id: 'mock-123',
+        email,
+        username: email.split('@')[0] || 'demo',
+        role,
+        tenant_id: 'mock-tenant-id'
+      };
+      
       setUser(loggedUser);
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('sneaker_pos_user', JSON.stringify(loggedUser));
-        }
-      } catch (e) {
-        console.warn('Failed to save user session to LocalStorage:', e);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('mock_user', JSON.stringify(loggedUser));
+        document.cookie = `mock_user=${encodeURIComponent(JSON.stringify(loggedUser))}; path=/; max-age=86400`;
       }
-      router.replace('/dashboard');
-      return true;
-    } else if (username === 'user' && password === 'user') {
-      const loggedUser: User = { username: 'Vendedor', role: 'seller' };
-      setUser(loggedUser);
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('sneaker_pos_user', JSON.stringify(loggedUser));
+
+      setTimeout(() => {
+        if (role === 'admin') {
+          router.replace('/dashboard');
+        } else {
+          router.replace('/pdv');
         }
-      } catch (e) {
-        console.warn('Failed to save user session to LocalStorage:', e);
-      }
-      router.replace('/pdv');
+      }, 100);
+
       return true;
+    } catch (err) {
+      console.error('Failed to log in:', err);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.removeItem('sneaker_pos_user');
-      }
-    } catch (e) {
-      console.warn('Failed to remove user session from LocalStorage:', e);
+  const logout = async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('mock_user');
+      document.cookie = 'mock_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
+    setUser(null);
     router.replace('/login');
   };
 
