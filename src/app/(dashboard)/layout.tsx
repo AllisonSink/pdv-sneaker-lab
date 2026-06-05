@@ -457,12 +457,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         {/* Mobile Header (Hidden on Desktop) */}
         <header className="md:hidden h-16 bg-white dark:bg-zinc-950 border-b border-zinc-200/40 dark:border-zinc-900 px-4 flex items-center justify-between sticky top-0 z-40">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 relative z-50 p-2 -ml-2 cursor-pointer no-underline hover:no-underline hover:opacity-90 transition-opacity">
+          <div onClick={() => window.open('/', '_blank')} className="flex items-center gap-2 relative z-50 p-2 -ml-2 cursor-pointer no-underline hover:no-underline hover:opacity-90 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-900 font-bold">
               S
             </div>
             <span className="font-bold tracking-tight text-sm text-zinc-900 dark:text-zinc-50">Sneaker Lab</span>
-          </a>
+          </div>
 
           <div className="flex items-center gap-3">
             {user.role === 'admin' && (
