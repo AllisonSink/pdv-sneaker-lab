@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (isLoading) return;
 
-    const isPublicRoute = pathname === '/login' || pathname === '/planos' || pathname === '/';
+    const isPublicRoute = pathname === '/login' || pathname === '/planos' || pathname === '/' || pathname === '/cadastro';
 
     if (!user && !isPublicRoute) {
       router.replace('/login');
