@@ -61,6 +61,15 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
   const { teamMembers, registerSaleForMember } = useTeam();
   const [selectedSellerName, setSelectedSellerName] = useState('');
 
+  // Pre-fill seller with logged-in user name
+  useEffect(() => {
+    if (user) {
+      setSelectedSellerName(user.username || 'Allison Sink');
+    } else {
+      setSelectedSellerName('Allison Sink');
+    }
+  }, [user]);
+
   // Dialog State
   const [isOpeningOpen, setIsOpeningOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
@@ -213,6 +222,10 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
       }
 
       // POS Global Hotkeys
+      if (e.key === 'F2') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
       if (e.key === 'F8') {
         e.preventDefault();
         if (cart.length > 0) handleFinalizeSale();
@@ -650,7 +663,7 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
         <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden h-full items-stretch">
           
           {/* Left Column: Product Search & Size Selector */}
-          <section className="lg:col-span-7 p-4 lg:p-6 flex flex-col gap-6 border-r border-zinc-200/40 dark:border-zinc-900 bg-white/40 dark:bg-zinc-950/5 overflow-y-auto">
+          <section className="lg:col-span-7 p-4 lg:p-6 flex flex-col gap-6 border-r border-zinc-200/40 dark:border-zinc-900 bg-white dark:bg-zinc-955 overflow-y-auto">
             
             {/* Unified Search and Reader input bar */}
             <div className="relative">
@@ -658,7 +671,7 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Busque por marca, modelo ou bipe o código de barras..."
+                placeholder="Buscar produto ou bipar código (F2)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onBlur={keepSearchFocus}
@@ -749,18 +762,63 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
               </div>
             ) : (
               /* Catalog Fast Grid view (shows when no active search) */
-              <div className="flex-1 flex flex-col justify-center items-center py-12 border border-dashed border-zinc-200/50 dark:border-zinc-900 rounded-3xl bg-white/40 dark:bg-zinc-950/5">
-                <Barcode className="w-12 h-12 text-zinc-300 dark:text-zinc-800 mb-3 animate-pulse" />
-                <h3 className="text-sm font-semibold">Leitor de Código Ativo</h3>
-                <p className="text-xs text-zinc-450 mt-1 max-w-[240px] leading-relaxed">
-                  Pressione <kbd className="font-mono bg-zinc-100 dark:bg-zinc-850 px-1 py-0.5 rounded text-[10px]">F8</kbd> a qualquer momento para finalizar a venda no PDV de forma ágil.
-                </p>
+              <div className="flex-1 flex flex-col gap-6 justify-between p-6 border border-dashed border-zinc-200/60 dark:border-zinc-900 rounded-3xl bg-white/40 dark:bg-zinc-950/5">
+                
+                {/* Top section: Leitor Ativo */}
+                <div className="flex flex-col items-center justify-center py-4 text-center">
+                  <div className="flex items-center gap-2 text-zinc-455 dark:text-zinc-500 mb-2">
+                    <Barcode className="w-5 h-5 animate-pulse" />
+                    <span className="text-[10px] uppercase tracking-wider font-bold">Leitor de Código Ativo</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-450 dark:text-zinc-500">
+                    Pressione <kbd className="font-mono bg-zinc-100 dark:bg-zinc-850 px-1 py-0.5 rounded text-[10px] text-zinc-500">F2</kbd> para focar a busca ou <kbd className="font-mono bg-zinc-100 dark:bg-zinc-850 px-1 py-0.5 rounded text-[10px] text-zinc-500">F8</kbd> para finalizar a venda.
+                  </p>
+                </div>
+
+                {/* Bottom section: Acessórios & Venda Rápida */}
+                <div className="border-t border-zinc-100 dark:border-zinc-900/50 pt-5 space-y-3">
+                  <h3 className="text-[10px] uppercase tracking-wider font-bold text-zinc-450 dark:text-zinc-500">Acessórios & Venda Rápida</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { id: 'kit-limpeza', name: 'Kit Limpeza Premium', price: 89, brand: 'Sneaker Lab' },
+                      { id: 'meias', name: 'Par de Meias', price: 45, brand: 'Sneaker Lab' },
+                      { id: 'cadarco', name: 'Cadarço Extra', price: 20, brand: 'Sneaker Lab' },
+                      { id: 'sacola', name: 'Sacola Presente', price: 10, brand: 'Sneaker Lab' }
+                    ].map(item => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          const tempProduct: Product = {
+                            id: item.id,
+                            name: item.name,
+                            brand: item.brand,
+                            group: item.brand,
+                            price: item.price,
+                            imageUrl: '/shoes/placeholder.png',
+                            sizes: [{ sku: `SKU-${item.id.toUpperCase()}`, size: 'U', stock: 99, barcode: `BAR-${item.id.toUpperCase()}` }],
+                            colorway: 'Acessório'
+                          };
+                          addToCart(tempProduct, 'U');
+                        }}
+                        className="p-3 bg-white dark:bg-zinc-900 border border-zinc-200/55 dark:border-zinc-800/80 hover:border-zinc-400 dark:hover:border-zinc-700 rounded-2xl transition-all text-left flex flex-col justify-between hover:shadow-sm group active:scale-[0.98] cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-955 dark:group-hover:text-zinc-50 transition-colors">
+                          {item.name}
+                        </span>
+                        <span className="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 mt-2 block">
+                          {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             )}
           </section>
 
           {/* Right Column: Checkout Cart & Bill Receipt Details */}
-          <section className="lg:col-span-5 bg-white dark:bg-zinc-950 flex flex-col justify-between overflow-hidden relative shadow-2xl border-l border-zinc-100 dark:border-zinc-900">
+          <section className="lg:col-span-5 bg-zinc-50 dark:bg-zinc-900/30 flex flex-col justify-between overflow-hidden relative shadow-2xl border-l border-zinc-100/40 dark:border-zinc-900/50">
             
             {/* Header */}
             <div className="p-5 border-b border-zinc-150/40 dark:border-zinc-900 flex justify-between items-center shrink-0">
@@ -843,24 +901,8 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
 
             {/* Checkout Form section */}
             <div className="p-5 border-t border-zinc-150/40 dark:border-zinc-900 bg-zinc-50/20 dark:bg-zinc-950/20 space-y-4 shrink-0">
-              
-              {/* Vendedor Selector */}
-              <div className="flex justify-between items-center text-xs font-medium py-1">
-                <span className="text-zinc-550 dark:text-zinc-400">Vendedor Responsável</span>
-                <select
-                  value={selectedSellerName}
-                  onChange={(e) => setSelectedSellerName(e.target.value)}
-                  className="bg-zinc-55 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg text-xs font-semibold py-1 px-2 focus:outline-none focus:ring-1 focus:ring-zinc-955 dark:focus:ring-zinc-50 transition-all text-right cursor-pointer"
-                >
-                  <option value="">Selecione...</option>
-                  {teamMembers.filter(m => m.status === 'active').map(member => (
-                    <option key={member.id} value={member.name}>{member.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Customer input fields */}
-              <div className="grid grid-cols-2 gap-3 pt-1 border-t border-zinc-100/50 dark:border-zinc-900/50">
+              {/* Customer input fields & Vendedor */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1 border-t border-zinc-150/40 dark:border-zinc-900/50">
                 <div className="space-y-1">
                   <label className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider">Cliente (Nome)</label>
                   <input
@@ -868,7 +910,7 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
                     placeholder="Consumidor Geral"
                     value={customer.name}
                     onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 bg-zinc-55 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-805 rounded-xl text-base md:text-xs font-medium focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-xl text-xs font-medium focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
                 </div>
                 <div className="space-y-1">
@@ -878,8 +920,24 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
                     placeholder="000.000.000-00"
                     value={customer.cpf}
                     onChange={(e) => setCustomer(prev => ({ ...prev, cpf: e.target.value }))}
-                    className="w-full px-3 py-2 bg-zinc-55 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-805 rounded-xl text-base md:text-xs font-medium focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-650"
+                    className="w-full px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-xl text-xs font-medium focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-650"
                   />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider">Vendedor</label>
+                  <select
+                    value={selectedSellerName}
+                    onChange={(e) => setSelectedSellerName(e.target.value)}
+                    className="w-full px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer"
+                  >
+                    <option value="">Selecione...</option>
+                    {teamMembers.filter(m => m.status === 'active').map(member => (
+                      <option key={member.id} value={member.name}>{member.name}</option>
+                    ))}
+                    {user && !teamMembers.some(m => m.name === user.username) && (
+                      <option value={user.username}>{user.username}</option>
+                    )}
+                  </select>
                 </div>
               </div>
 
