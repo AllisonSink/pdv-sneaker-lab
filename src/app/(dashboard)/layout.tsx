@@ -396,6 +396,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Sidebar Footer / User Profile & Logout */}
         <div className="mt-auto p-4 border-t border-border pb-6 transition-all duration-300">
+          {isSidebarExpanded && (
+            <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">Plano Básico</span>
+                <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-50">Grátis</span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Desbloqueie todos os recursos.</p>
+              <button 
+                onClick={() => window.open('/planos', '_blank')}
+                className="mt-1 w-full py-2 px-3 bg-zinc-900 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer select-none"
+              >
+                <span>✨</span>
+                <span>Atualizar Plano</span>
+              </button>
+            </div>
+          )}
           {isSidebarExpanded ? (
             <div className="flex items-center justify-between p-1 rounded-2xl bg-transparent">
               <button
