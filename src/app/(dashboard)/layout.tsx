@@ -404,7 +404,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Desbloqueie todos os recursos.</p>
               <button 
-                onClick={() => window.open('/planos', '_blank')}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open('/planos', '_blank'); }}
                 className="mt-1 w-full py-2 px-3 bg-zinc-900 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer select-none"
               >
                 <span>✨</span>

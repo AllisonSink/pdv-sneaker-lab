@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (!user && !isPublicRoute) {
       router.replace('/login');
-    } else if (user && isPublicRoute) {
+    } else if (user && pathname === '/login') {
       if (user.role === 'admin') {
         router.replace('/dashboard');
       } else {
