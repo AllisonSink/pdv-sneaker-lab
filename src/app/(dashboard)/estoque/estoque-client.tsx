@@ -18,7 +18,8 @@ import {
   Sparkles,
   Save,
   Barcode,
-  Camera
+  Camera,
+  Image
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -75,10 +76,17 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addName, setAddName] = useState('');
   const [addBrand, setAddBrand] = useState('');
-  const [addSelectedSizes, setAddSelectedSizes] = useState<string[]>([]);
+  const [addColorway, setAddColorway] = useState('');
+  const [addSku, setAddSku] = useState('');
+  const [addSizeStocks, setAddSizeStocks] = useState<Record<string, number>>({});
   const [addPriceCost, setAddPriceCost] = useState('');
   const [addPrice, setAddPrice] = useState('');
   const [addError, setAddError] = useState('');
+
+  // Image Upload for Add Modal
+  const [addFormImageUrl, setAddFormImageUrl] = useState('');
+  const [isAddCompressing, setIsAddCompressing] = useState(false);
+  const addFileInputRef = useRef<HTMLInputElement>(null);
 
   // Drag and drop / File Upload state for edit form
   const [isDragging, setIsDragging] = useState(false);
@@ -217,6 +225,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
       return;
     }
 
+    const addSelectedSizes = Object.keys(addSizeStocks);
     if (addSelectedSizes.length === 0) {
       setAddError('Por favor, selecione pelo menos um tamanho disponível.');
       return;
@@ -228,16 +237,19 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
     const sizesGrid = addSelectedSizes.map(size => {
       const cleanBrand = addBrand.toUpperCase().replace(/\s+/g, '').slice(0, 3);
       const cleanName = addName.toUpperCase().replace(/\s+/g, '').slice(0, 5);
-      const autoSku = `${cleanBrand}-${cleanName}-${size}`;
+      const baseSku = addSku.trim() || `${cleanBrand}-${cleanName}`;
+      const autoSku = `${baseSku}-${size}`;
       const autoBarcode = `789000${Math.floor(100000 + Math.random() * 900000).toString().slice(-6)}`;
 
       return {
         size: size,
         sku: autoSku,
         barcode: autoBarcode,
-        stock: 10 // initialize default stock to 10
+        stock: Math.max(0, addSizeStocks[size] ?? 0)
       };
     });
+
+    const finalImageUrl = addFormImageUrl || SNEAKER_IMAGES.airforce;
 
     const { error } = await supabase
       .from('produtos')
@@ -247,8 +259,9 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
         group: addBrand.trim(),
         price: priceNum,
         price_cost: priceCostNum,
+        colorway: addColorway.trim(),
         sizes: sizesGrid,
-        image_url: SNEAKER_IMAGES.airforce,
+        image_url: finalImageUrl,
         user_id: user.id
       });
 
@@ -261,9 +274,10 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
       setIsAddModalOpen(false);
       setAddName('');
       setAddBrand('');
-      setAddSelectedSizes([]);
-      setAddPriceCost('');
-      setAddPrice('');
+      setAddColorway('');
+      setAddSku('');
+      setAddSizeStocks({});
+      setAddFormImageUrl('');
       setAddError('');
       router.refresh();
     }
@@ -359,9 +373,94 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
   };
 
   const handleSizeToggle = (size: string) => {
-    setAddSelectedSizes(prev => 
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-    );
+    setAddSizeStocks(prev => {
+      const next = { ...prev };
+      if (size in next) {
+        delete next[size];
+      } else {
+        next[size] = 1;
+      }
+      return next;
+    });
+  };
+
+  const generateSKU = () => {
+    if (!addName.trim() || !addColorway.trim()) {
+      toast.warning('Preencha o nome e a cor para gerar o SKU');
+      return;
+    }
+
+    const cleanName = addName.trim().toUpperCase();
+    const cleanColor = addColorway.trim().toUpperCase().slice(0, 3);
+    
+    const nameWords = cleanName.split(/[\s\-_/]+/).filter(Boolean);
+    
+    if (nameWords.length === 0) {
+      toast.error('Nome inválido para gerar SKU');
+      return;
+    }
+
+    const skuParts: string[] = [];
+    const firstWord = nameWords[0];
+    skuParts.push(firstWord);
+
+    const numberWord = nameWords.find(w => /\d+/.test(w));
+    if (numberWord && numberWord !== firstWord) {
+      skuParts.push(numberWord);
+    } else if (nameWords.length > 1) {
+      const secondWord = nameWords.find(w => w !== firstWord && w !== 'BOOST' && w !== 'RETRO' && w !== 'LOW' && w !== 'HIGH');
+      if (secondWord) {
+        skuParts.push(secondWord.slice(0, 3));
+      }
+    }
+
+    skuParts.push(cleanColor);
+
+    const generated = skuParts.join('-');
+    setAddSku(generated);
+    toast.success('SKU gerado com sucesso!');
+  };
+
+  const handleAddFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processAddImageFile(file);
+    }
+  };
+
+  const processAddImageFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setAddError('Por favor, carregue apenas arquivos de imagem.');
+      return;
+    }
+    
+    setIsAddCompressing(true);
+    setAddError('');
+
+    try {
+      const options = {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 1080,
+        useWebWorker: true
+      };
+
+      const compressedFile = await imageCompression(file, options);
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setAddFormImageUrl(event.target.result as string);
+          setAddError('');
+        }
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error('Erro ao comprimir imagem do cadastro:', error);
+      setAddError('Falha ao processar e otimizar imagem. Tente outro arquivo.');
+      toast.error('Falha ao otimizar imagem.');
+    } finally {
+      setIsAddCompressing(false);
+    }
   };
 
   // Dynamic Unique Groups
@@ -498,7 +597,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
           {viewMode === 'detailed' && (
             <div className="space-y-6">
               {filteredProducts.map(prod => {
-                const totalStock = prod.sizes.reduce((sum, s) => sum + s.stock, 0);
+                const totalStock = prod.sizes?.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) || 0;
                 return (
                   <div 
                     key={prod.id} 
@@ -506,9 +605,13 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-4 mb-4 gap-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 shrink-0 overflow-hidden">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover object-center" />
+                        <div className="w-14 h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 shrink-0 overflow-hidden flex items-center justify-center">
+                          {prod.imageUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover object-center" />
+                          ) : (
+                            <Image className="w-5 h-5 text-zinc-300 dark:text-zinc-700" />
+                          )}
                         </div>
                         <div>
                           <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{prod.brand}</span>
@@ -544,33 +647,47 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                         </button>
                       </div>
                     </div>
-
                     {/* Sizes Grid */}
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                      {prod.sizes.map((sz, idx) => (
-                        <div 
-                          key={idx}
-                          className={`p-3 rounded-2xl border transition-all flex flex-col justify-between ${
-                            sz.stock === 0
-                              ? 'bg-red-50/20 border-red-200/30 dark:bg-red-955/5 dark:border-red-900/10 opacity-60'
-                              : sz.stock <= 2
-                              ? 'bg-amber-50/20 border-amber-250/30 dark:bg-amber-955/5 dark:border-amber-900/10'
-                              : 'bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/20 dark:border-zinc-850'
-                          }`}
-                        >
-                          <div>
-                            <span className="text-xs font-black tracking-tight block">Tam. {sz.size}</span>
-                            <span className="text-[8px] font-mono text-zinc-400 dark:text-zinc-500 tracking-tight block truncate mt-0.5" title={sz.sku}>{sz.sku}</span>
+                      {prod.sizes.map((sz, idx) => {
+                        const stockNum = Number(sz.stock) || 0;
+                        return (
+                          <div 
+                            key={idx}
+                            className={`p-3 rounded-2xl border transition-all flex flex-col justify-between ${
+                              stockNum === 0
+                                ? 'bg-zinc-50/50 border-zinc-200/40 dark:bg-zinc-950/20 dark:border-zinc-900 opacity-60 text-zinc-400'
+                                : stockNum <= 2
+                                ? 'bg-amber-50/20 border-amber-250/30 dark:bg-amber-955/5 dark:border-amber-900/10'
+                                : 'bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/20 dark:border-zinc-850'
+                            }`}
+                          >
+                            <div>
+                              <span className={`text-xs font-black tracking-tight block ${stockNum === 0 ? 'text-zinc-450 dark:text-zinc-550' : ''}`}>
+                                Tam. {sz.size}
+                              </span>
+                              <span className="text-[8px] font-mono text-zinc-400 dark:text-zinc-550 tracking-tight block truncate mt-0.5" title={sz.sku}>{sz.sku}</span>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-900/40">
+                              {stockNum === 0 ? (
+                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Esgotado</span>
+                              ) : (
+                                <span className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                  {stockNum} em estoque
+                                </span>
+                              )}
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                stockNum === 0 
+                                  ? 'bg-zinc-300 dark:bg-zinc-700' 
+                                  : stockNum <= 2 
+                                  ? 'bg-amber-500' 
+                                  : 'bg-emerald-500'
+                              }`} />
+                            </div>
                           </div>
-                          
-                          <div className="flex items-center justify-between mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-900/40">
-                            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Estoque</span>
-                            <span className={`text-xs font-black ${sz.stock === 0 ? 'text-red-500' : sz.stock <= 2 ? 'text-amber-500' : 'text-zinc-800 dark:text-zinc-200'}`}>
-                              {sz.stock}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
@@ -582,18 +699,22 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
           {viewMode === 'grid' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map(prod => {
-                const totalStock = prod.sizes.reduce((sum, s) => sum + s.stock, 0);
+                const totalStock = prod.sizes?.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) || 0;
                 return (
                   <div 
                     key={prod.id} 
-                    className="bg-white dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 shadow-sm rounded-3xl p-5 flex flex-col justify-between"
+                    className="bg-white dark:bg-zinc-955 border border-zinc-200/50 dark:border-zinc-900 shadow-sm rounded-3xl p-5 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 overflow-hidden shrink-0">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" />
+                          <div className="w-12 h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 overflow-hidden shrink-0 flex items-center justify-center">
+                            {prod.imageUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Image className="w-5 h-5 text-zinc-300 dark:text-zinc-700" />
+                            )}
                           </div>
                           <div className="min-w-0">
                             <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest block">{prod.brand}</span>
@@ -667,7 +788,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-900">
                     {filteredProducts.map(prod => {
-                      const totalStock = prod.sizes.reduce((sum, s) => sum + s.stock, 0);
+                      const totalStock = prod.sizes?.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) || 0;
                       return (
                         <tr 
                           key={prod.id}
@@ -723,7 +844,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md transition-all duration-300 animate-in fade-in">
           <div 
-            className="w-full max-w-md overflow-hidden bg-white/98 dark:bg-zinc-900/98 border border-zinc-200/50 dark:border-zinc-800/50 shadow-2xl rounded-3xl p-6 md:p-8 flex flex-col transform scale-100 transition-transform duration-300 animate-in zoom-in-95"
+            className="w-full max-w-lg overflow-hidden bg-white/98 dark:bg-zinc-900/98 border border-zinc-200/50 dark:border-zinc-800/50 shadow-2xl rounded-3xl p-6 md:p-8 flex flex-col transform scale-100 transition-transform duration-300 animate-in zoom-in-95"
           >
             <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 tracking-tight mb-6 w-full text-left uppercase flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
@@ -739,6 +860,40 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
 
             <form onSubmit={handleAddProductSubmit} className="space-y-4 w-full">
               
+              {/* Espaço para Foto */}
+              <div className="flex flex-col items-center justify-center pb-2">
+                <input 
+                  type="file" 
+                  ref={addFileInputRef} 
+                  onChange={handleAddFileChange} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
+                <div 
+                  onClick={() => addFileInputRef.current?.click()}
+                  className={`w-24 h-24 rounded-2xl border border-dashed flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden transition-all duration-200 ${
+                    addFormImageUrl 
+                      ? 'border-zinc-200 dark:border-zinc-800' 
+                      : 'border-zinc-300 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-600 bg-zinc-50/50 dark:bg-zinc-900/30'
+                  }`}
+                >
+                  {addFormImageUrl ? (
+                    <div className="relative w-full h-full group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={addFormImageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <Camera className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-2">
+                      <Image className="w-6 h-6 text-zinc-400 dark:text-zinc-500 mb-1" />
+                      <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">Adicionar Foto</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Nome do Tênis */}
               <div className="space-y-1">
                 <label htmlFor="addName" className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Nome do Tênis</label>
@@ -753,18 +908,56 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                 />
               </div>
 
-              {/* Marca */}
+              {/* Marca & Cor / Colorway */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label htmlFor="addBrand" className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Marca</label>
+                  <input 
+                    id="addBrand"
+                    type="text" 
+                    placeholder="Ex: Adidas" 
+                    value={addBrand}
+                    onChange={(e) => setAddBrand(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-400 dark:placeholder-zinc-650"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="addColorway" className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Cor / Colorway</label>
+                  <input 
+                    id="addColorway"
+                    type="text" 
+                    placeholder="Ex: Zebra" 
+                    value={addColorway}
+                    onChange={(e) => setAddColorway(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-400 dark:placeholder-zinc-650"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Código de Barras (SKU) com Gerador Automático Embutido */}
               <div className="space-y-1">
-                <label htmlFor="addBrand" className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Marca</label>
-                <input 
-                  id="addBrand"
-                  type="text" 
-                  placeholder="Ex: Adidas" 
-                  value={addBrand}
-                  onChange={(e) => setAddBrand(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-400 dark:placeholder-zinc-650"
-                  required
-                />
+                <label htmlFor="addSku" className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Código de Barras (SKU)</label>
+                <div className="relative">
+                  <input 
+                    id="addSku"
+                    type="text" 
+                    placeholder="Ex: YZE-350-ZEB" 
+                    value={addSku}
+                    onChange={(e) => setAddSku(e.target.value)}
+                    className="w-full pl-4 pr-10 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-400 dark:placeholder-zinc-650"
+                  />
+                  <button
+                    type="button"
+                    onClick={generateSKU}
+                    title="Gerar SKU Automático"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-805/65 transition-all cursor-pointer flex items-center justify-center"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors" />
+                  </button>
+                </div>
               </div>
 
               {/* Preço de Custo e Venda */}
@@ -796,25 +989,52 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                 </div>
               </div>
 
-              {/* Tamanhos Disponíveis */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Tamanhos Disponíveis</label>
-                <div className="flex flex-wrap gap-1.5 p-3.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/30 dark:border-zinc-850 rounded-2xl max-h-36 overflow-y-auto">
+              {/* Grade de Tamanhos & Lógica de Quantidade */}
+              <div className="space-y-2">
+                <label className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-semibold block">Grade de Tamanhos & Estoque</label>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-52 overflow-y-auto p-1.5 border border-zinc-250/20 dark:border-zinc-850 rounded-2xl bg-zinc-50/20 dark:bg-zinc-900/10">
                   {AVAILABLE_SIZES.map(size => {
-                    const isSelected = addSelectedSizes.includes(size);
+                    const isSelected = size in addSizeStocks;
+                    const qty = addSizeStocks[size] ?? '';
                     return (
-                      <button
+                      <div 
                         key={size}
-                        type="button"
-                        onClick={() => handleSizeToggle(size)}
-                        className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer select-none active:scale-95 ${
-                          isSelected
-                            ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-zinc-50 dark:border-zinc-50 dark:text-zinc-950'
-                            : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:border-zinc-850 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                        className={`flex flex-col p-2 rounded-xl border transition-all ${
+                          isSelected 
+                            ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-zinc-50 dark:border-zinc-50 dark:text-zinc-950 shadow-sm shadow-zinc-900/10 dark:shadow-zinc-50/5' 
+                            : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-500 hover:text-zinc-800 dark:bg-zinc-950 dark:border-zinc-850 dark:text-zinc-450 dark:hover:bg-zinc-900/60'
                         }`}
                       >
-                        {size}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSizeToggle(size)}
+                          className="w-full text-center text-xs font-bold py-1 select-none active:scale-95 cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />}
+                          Tam. {size}
+                        </button>
+                        
+                        {isSelected && (
+                          <div className="mt-1.5 pt-1.5 border-t border-zinc-800 dark:border-zinc-200/20 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                            <span className="text-[8px] font-extrabold uppercase tracking-wider opacity-85">Qtd:</span>
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              value={qty}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                setAddSizeStocks(prev => ({
+                                  ...prev,
+                                  [size]: isNaN(val) ? 0 : val
+                                }));
+                              }}
+                              className="w-full text-center text-[10px] font-bold bg-zinc-805 text-zinc-100 dark:bg-zinc-200 dark:text-zinc-900 border-0 rounded py-0.5 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -831,7 +1051,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-4 bg-zinc-900 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-2xl transition-all text-xs shadow-md cursor-pointer flex items-center justify-center gap-1"
+                  className="flex-1 py-3 px-4 bg-zinc-900 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-955 font-bold rounded-2xl transition-all text-xs shadow-md cursor-pointer flex items-center justify-center gap-1"
                 >
                   <Save className="w-3.5 h-3.5" /> Salvar Produto
                 </button>
