@@ -121,7 +121,7 @@ export default function LandingPageClient() {
           {/* Hero CTAs */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-6">
             <Link
-              href="/login"
+              href="/cadastro"
               className="w-full sm:w-auto px-8 py-4 bg-black hover:bg-zinc-800 active:bg-zinc-900 text-white font-semibold rounded-2xl transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 text-sm"
             >
               Começar o Teste Grátis
@@ -288,7 +288,7 @@ export default function LandingPageClient() {
 
                 <CardFooter className="p-6 pt-0 mt-auto">
                   <Link
-                    href="/login"
+                    href="/cadastro"
                     className={`w-full py-3.5 px-4 rounded-xl text-xs font-bold text-center transition-all duration-200 select-none active:scale-[0.98] ${
                       plan.highlighted
                         ? 'bg-black hover:bg-zinc-800 active:bg-zinc-900 text-white shadow-md'
