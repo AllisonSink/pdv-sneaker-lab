@@ -13,7 +13,10 @@ import {
   Trash2, 
   AlertTriangle, 
   CheckCircle,
-  Clock
+  Clock,
+  Receipt,
+  Printer,
+  ChevronRight
 } from 'lucide-react';
 import { Sale, Product, CartItem, PaymentMethod, SizeStock } from '@/types';
 import { useRouter } from 'next/navigation';
@@ -38,6 +41,7 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [isExchangeOpen, setIsExchangeOpen] = useState(false);
   const [isReturnOpen, setIsReturnOpen] = useState(false);
+  const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
 
   // Exchange sub-form states
   const [exchangeItem, setExchangeItem] = useState<CartItem | null>(null);
@@ -289,7 +293,7 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200/40 dark:border-zinc-900 rounded-3xl overflow-hidden shadow-sm animate-in fade-in duration-200">
+        <div className="bg-white dark:bg-zinc-955 border border-zinc-200/40 dark:border-zinc-900 rounded-3xl overflow-hidden shadow-sm animate-in fade-in duration-200">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -298,7 +302,8 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
                   <th className="py-4 px-4">Cliente</th>
                   <th className="py-4 px-4">ID do Recibo</th>
                   <th className="py-4 px-4 text-right">Valor Total</th>
-                  <th className="py-4 px-6 text-center">Status</th>
+                  <th className="py-4 px-4 text-center">Status</th>
+                  <th className="py-4 px-6 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,7 +311,7 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
                   <tr 
                     key={sale.id}
                     onClick={() => setSelectedSale(sale)}
-                    className="border-b border-zinc-100 dark:border-zinc-900 text-xs hover:bg-zinc-55/50 dark:hover:bg-zinc-900/30 transition-colors cursor-pointer"
+                    className="border-b border-zinc-100 dark:border-zinc-900 text-xs hover:bg-zinc-55/50 dark:hover:bg-zinc-900/30 transition-colors cursor-pointer animate-in fade-in"
                   >
                     <td className="py-4 px-6 font-medium text-zinc-500 dark:text-zinc-400">
                       <div className="flex items-center gap-1.5">
@@ -323,8 +328,18 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
                     <td className="py-4 px-4 text-right font-black text-zinc-900 dark:text-zinc-50">
                       {sale.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </td>
-                    <td className="py-4 px-6 text-center">
+                    <td className="py-4 px-4 text-center">
                       {getStatusBadge(sale.status)}
+                    </td>
+                    <td className="py-4 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSale(sale)}
+                        className="p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer flex items-center justify-center mx-auto"
+                        title="Ver Recibo"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -350,14 +365,17 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
             {/* Header */}
             <div className="h-16 border-b border-zinc-150/40 dark:border-zinc-900 px-6 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-zinc-950 dark:bg-zinc-50" />
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-950 dark:bg-zinc-50 animate-pulse" />
                 <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 tracking-tight uppercase">
-                  Detalhes do Recibo
+                  Detalhes da Venda
                 </h2>
+                <span className="text-xs font-mono bg-zinc-100 dark:bg-zinc-900 px-2.5 py-0.5 rounded-md text-zinc-600 dark:text-zinc-400 font-bold ml-2">
+                  {selectedSale.id}
+                </span>
               </div>
               <button
                 onClick={() => setSelectedSale(null)}
-                className="p-1.5 rounded-xl hover:bg-zinc-55/60 dark:hover:bg-zinc-900 text-zinc-450 hover:text-zinc-650 cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-zinc-55/60 dark:hover:bg-zinc-900 text-zinc-455 hover:text-zinc-650 cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -367,33 +385,22 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               
               {/* Receipt Header details */}
-              <div className="p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/20 dark:border-zinc-850 rounded-2xl space-y-2.5 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-450 dark:text-zinc-500 font-semibold uppercase">ID Recibo</span>
-                  <span className="font-mono font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{selectedSale.id}</span>
-                </div>
+              <div className="p-4 bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/40 dark:border-zinc-900 rounded-3xl space-y-2.5 text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-zinc-450 dark:text-zinc-500 font-semibold uppercase">Data / Hora</span>
-                  <span className="text-zinc-800 dark:text-zinc-200">{selectedSale.createdAt}</span>
+                  <span className="text-zinc-800 dark:text-zinc-200 font-semibold">{selectedSale.createdAt}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-455 dark:text-zinc-500 font-semibold uppercase">Forma de Pagamento</span>
-                  <span className="font-bold flex items-center gap-1.5 text-zinc-850 dark:text-zinc-200">
-                    {getPaymentIcon(selectedSale.paymentMethod)}
-                    {getPaymentLabel(selectedSale.paymentMethod)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center border-t border-zinc-100 dark:border-zinc-800/80 pt-2">
+                <div className="flex justify-between items-center border-t border-zinc-100/50 dark:border-zinc-800/30 pt-2.5">
                   <span className="text-zinc-450 dark:text-zinc-500 font-semibold uppercase">Cliente</span>
-                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">{selectedSale.customer?.name || 'Cliente Geral'}</span>
+                  <span className="font-bold text-zinc-800 dark:text-zinc-200">{selectedSale.customer?.name || 'Cliente Geral'}</span>
                 </div>
                 {selectedSale.customer?.cpf && (
                   <div className="flex justify-between items-center">
                     <span className="text-zinc-450 dark:text-zinc-500 font-semibold uppercase">CPF</span>
-                    <span className="font-mono text-zinc-700 dark:text-zinc-355">{selectedSale.customer.cpf}</span>
+                    <span className="font-mono text-zinc-700 dark:text-zinc-300 font-semibold">{selectedSale.customer.cpf}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center border-t border-zinc-100 dark:border-zinc-800/80 pt-2">
+                <div className="flex justify-between items-center border-t border-zinc-100/50 dark:border-zinc-800/30 pt-2.5">
                   <span className="text-zinc-450 dark:text-zinc-500 font-semibold uppercase">Status</span>
                   <span>{getStatusBadge(selectedSale.status)}</span>
                 </div>
@@ -402,27 +409,29 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
               {/* Items List */}
               <div className="space-y-3">
                 <h3 className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider">Itens Comprados</h3>
-                <div className="space-y-3">
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-900 border border-zinc-200/40 dark:border-zinc-900 rounded-3xl bg-white dark:bg-zinc-950 overflow-hidden px-4">
                   {selectedSale.items.map((item, idx) => (
                     <div 
                       key={idx}
-                      className="p-3 bg-white dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-900 rounded-2xl flex items-center gap-3"
+                      className="py-3.5 flex items-center justify-between"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 shrink-0 overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.product.imageUrl} alt={item.product.name} className="w-full h-full object-cover" />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-150/10 shrink-0 overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.product.imageUrl} alt={item.product.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-150 truncate leading-tight">
+                            {item.quantity}x {item.product.brand} {item.product.name}
+                          </h4>
+                          <p className="text-[10px] text-zinc-450 dark:text-zinc-500 font-medium mt-0.5">
+                            Tam {item.size} • {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} c/u
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold truncate text-zinc-900 dark:text-zinc-100 leading-tight">
-                          {item.product.brand} {item.product.name}
-                        </h4>
-                        <p className="text-[10px] text-zinc-450 mt-0.5">
-                          Tamanho {item.size} • {item.quantity} un. x {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                          {((item.price) * item.quantity).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      <div className="text-right shrink-0 ml-4">
+                        <span className="text-xs font-black text-zinc-900 dark:text-zinc-50">
+                          {(item.price * item.quantity).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         </span>
                       </div>
                     </div>
@@ -431,20 +440,31 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
               </div>
 
               {/* Totals */}
-              <div className="border-t border-zinc-100 dark:border-zinc-900 pt-4 space-y-2 text-xs font-semibold">
-                <div className="flex justify-between items-center text-zinc-500">
+              <div className="border-t border-zinc-100 dark:border-zinc-900 pt-4 space-y-2.5 text-xs font-semibold">
+                <div className="flex justify-between items-center text-zinc-550 dark:text-zinc-400 font-semibold">
                   <span>Subtotal</span>
-                  <span>{selectedSale.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                    {selectedSale.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </span>
                 </div>
                 {selectedSale.subtotal - selectedSale.total > 0 && (
-                  <div className="flex justify-between items-center text-zinc-500">
+                  <div className="flex justify-between items-center text-zinc-550 dark:text-zinc-400 font-semibold">
                     <span>Desconto</span>
-                    <span>{(selectedSale.subtotal - selectedSale.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    <span className="font-semibold text-green-600 dark:text-green-400">
+                      -{(selectedSale.subtotal - selectedSale.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
                   </div>
                 )}
-                <div className="flex justify-between items-end pt-2 text-sm font-black border-t border-zinc-100 dark:border-zinc-900/60">
+                <div className="flex justify-between items-center text-zinc-550 dark:text-zinc-400 font-semibold">
+                  <span>Forma de Pagamento</span>
+                  <span className="font-bold flex items-center gap-1.5 text-zinc-800 dark:text-zinc-200">
+                    {getPaymentIcon(selectedSale.paymentMethod)}
+                    {getPaymentLabel(selectedSale.paymentMethod)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-end pt-3 text-sm font-black border-t border-zinc-100 dark:border-zinc-900/65">
                   <span className="text-zinc-900 dark:text-zinc-100 font-bold">Total Pago</span>
-                  <span className="text-lg font-black text-zinc-900 dark:text-zinc-55">
+                  <span className="text-lg font-black text-zinc-900 dark:text-zinc-50">
                     {selectedSale.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
                 </div>
@@ -457,30 +477,26 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
               {selectedSale.status !== 'returned' ? (
                 <>
                   <div className="grid grid-cols-2 gap-3 w-full">
-                    {/* Process Exchange Button */}
+                    {/* Imprimir 2ª Via Button */}
                     <button
                       type="button"
-                      disabled={selectedSale.status === 'exchanged'}
                       onClick={() => {
-                        if (selectedSale.items.length > 0) {
-                          setExchangeItem(selectedSale.items[0]);
-                        }
-                        setIsExchangeOpen(true);
+                        toast.success('Sinal de impressão enviado! Imprimindo 2ª via do recibo ' + selectedSale.id + '...');
                       }}
-                      className="py-3 px-4 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-850 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-850 text-xs font-bold rounded-2xl transition-all active:scale-98 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer disabled:opacity-45"
+                      className="py-3 px-4 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-850 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 text-xs font-bold rounded-2xl transition-all active:scale-98 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer shadow-xs"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 text-zinc-500" />
-                      Processar Troca
+                      <Printer className="w-3.5 h-3.5 text-zinc-500" />
+                      Imprimir 2ª Via
                     </button>
                     
-                    {/* Process Refund/Return Button */}
+                    {/* Iniciar Troca / Devolução Button */}
                     <button
                       type="button"
-                      onClick={() => setIsReturnOpen(true)}
-                      className="py-3 px-4 bg-red-50 hover:bg-red-105 dark:bg-red-950/20 text-red-500 border border-red-200/20 dark:border-red-900/10 text-xs font-bold rounded-2xl transition-all active:scale-98 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer"
+                      onClick={() => setIsOptionsModalOpen(true)}
+                      className="py-3 px-4 bg-red-50/50 hover:bg-red-50 dark:bg-red-955/10 dark:hover:bg-red-955/20 text-red-600 dark:text-red-400 border border-red-200/20 dark:border-red-900/10 text-xs font-bold rounded-2xl transition-all active:scale-98 flex items-center justify-center gap-1.5 focus:outline-none cursor-pointer"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Estornar Venda
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      Iniciar Troca / Devolução
                     </button>
                   </div>
                 </>
@@ -635,6 +651,84 @@ export default function HistoricoClient({ initialSales, initialProducts }: { ini
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Modal: Escolha Troca / Devolução */}
+      {isOptionsModalOpen && selectedSale && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/45 backdrop-blur-md transition-all duration-300 animate-in fade-in">
+          <div 
+            className="w-full max-w-md overflow-hidden bg-white dark:bg-zinc-950 border border-zinc-200/40 dark:border-zinc-900 shadow-2xl rounded-3xl p-6 md:p-8 flex flex-col transform scale-100 transition-transform duration-300 animate-in zoom-in-95"
+          >
+            <div className="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 mb-4 border border-zinc-200/10 flex items-center justify-center self-center shrink-0">
+              <RotateCcw className="w-5 h-5 text-zinc-500" />
+            </div>
+
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 tracking-tight text-center mb-2">
+              Iniciar Troca ou Devolução
+            </h3>
+            <p className="text-xs text-zinc-450 dark:text-zinc-500 mb-6 text-center leading-relaxed">
+              Escolha a operação que deseja realizar para a venda <span className="font-mono font-bold">{selectedSale.id}</span>.
+            </p>
+
+            <div className="w-full space-y-3.5 mb-6">
+              {/* Option 1: Trocar Item */}
+              <button
+                type="button"
+                disabled={selectedSale.status === 'exchanged'}
+                onClick={() => {
+                  setIsOptionsModalOpen(false);
+                  if (selectedSale.items.length > 0) {
+                    setExchangeItem(selectedSale.items[0]);
+                  }
+                  setIsExchangeOpen(true);
+                }}
+                className="w-full text-left p-4 rounded-2xl border border-zinc-200 dark:border-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all flex items-center gap-4 cursor-pointer disabled:opacity-45 disabled:pointer-events-none group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-450 flex items-center justify-center shrink-0">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+                    Trocar Item Específico
+                  </h4>
+                  <p className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-0.5">
+                    Devolver um produto da venda e gerar crédito para compras no PDV.
+                  </p>
+                </div>
+              </button>
+
+              {/* Option 2: Estornar Venda Completa */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOptionsModalOpen(false);
+                  setIsReturnOpen(true);
+                }}
+                className="w-full text-left p-4 rounded-2xl border border-zinc-200 dark:border-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all flex items-center gap-4 cursor-pointer group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-955/20 text-red-650 dark:text-red-400 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+                    Estornar Venda Completa
+                  </h4>
+                  <p className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-0.5">
+                    Cancelar o recibo e devolver o valor total das mercadorias.
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsOptionsModalOpen(false)}
+              className="w-full py-3 px-4 bg-zinc-100 hover:bg-zinc-200/80 active:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-900 text-zinc-800 dark:text-zinc-200 font-semibold rounded-2xl transition-all text-xs cursor-pointer focus:outline-none"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>
