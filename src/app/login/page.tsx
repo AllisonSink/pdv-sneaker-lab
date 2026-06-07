@@ -82,12 +82,12 @@ export default function LoginPage() {
         {/* Header Section */}
         <a href="/" target="_blank" rel="noopener noreferrer" className="flex flex-col gap-3 text-center cursor-pointer hover:opacity-80 transition-opacity">
           {/* Minimalist Premium Logo */}
-          <div className="mx-auto w-10 h-10 rounded-xl bg-zinc-950 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-955 font-black text-lg tracking-tight select-none">
-            S
+          <div className="mx-auto w-10 h-10 rounded-xl bg-zinc-955 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-955 font-black text-lg tracking-tight select-none">
+            K
           </div>
           <div className="mt-2 space-y-1">
             <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {isRegistering ? 'Criar nova conta' : 'Sneaker Lab'}
+              {isRegistering ? 'Criar nova conta' : 'Kicks PDV'}
             </h1>
             <p className="text-xs text-zinc-450 dark:text-zinc-500 font-medium">
               {isRegistering ? 'Cadastre sua loja de sneakers' : 'Frente de Caixa & Controle de Estoque'}
@@ -137,7 +137,7 @@ export default function LoginPage() {
                   <input
                     id="storeName"
                     type="text"
-                    placeholder="Ex: Sneaker Shop"
+                    placeholder="Ex: Kicks Shop"
                     value={storeNameInput}
                     onChange={(e) => setStoreNameInput(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/40 dark:border-zinc-800/40 rounded-xl text-base md:text-sm focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-455 dark:placeholder-zinc-600"
@@ -228,20 +228,20 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
-                onClick={() => handleQuickFill('admin@sneakerlab.com')}
+                onClick={() => handleQuickFill('admin@kickspdv.com')}
                 className="py-2.5 px-3 bg-zinc-50/50 hover:bg-zinc-100/50 dark:bg-zinc-900/30 dark:hover:bg-zinc-900/50 border border-zinc-150/45 dark:border-zinc-800/30 rounded-xl text-[10px] font-bold text-zinc-800 dark:text-zinc-355 flex flex-col items-center gap-0.5 transition-colors cursor-pointer"
               >
                 <span>Dono / Admin</span>
-                <span className="text-[8px] text-zinc-400 font-normal">admin@sneakerlab.com</span>
+                <span className="text-[8px] text-zinc-400 font-normal">admin@kickspdv.com</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickFill('seller@sneakerlab.com')}
+                onClick={() => handleQuickFill('seller@kickspdv.com')}
                 className="py-2.5 px-3 bg-zinc-50/50 hover:bg-zinc-100/50 dark:bg-zinc-900/30 dark:hover:bg-zinc-900/50 border border-zinc-150/45 dark:border-zinc-800/30 rounded-xl text-[10px] font-bold text-zinc-800 dark:text-zinc-355 flex flex-col items-center gap-0.5 transition-colors cursor-pointer"
               >
                 <span>Vendedor / Frente</span>
-                <span className="text-[8px] text-zinc-450 font-normal">seller@sneakerlab.com</span>
+                <span className="text-[8px] text-zinc-455 font-normal">seller@kickspdv.com</span>
               </button>
             </div>
           </div>

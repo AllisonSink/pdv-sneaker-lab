@@ -121,13 +121,13 @@ export function createClient(): SupabaseClient {
   if (isMockMode) {
     let mockUser = {
       id: 'mock-user-id',
-      email: 'admin@sneakerlab.com',
+      email: 'admin@kickspdv.com',
       user_metadata: {
         username: 'admin',
         role: 'admin',
         tenant_id: 'mock-tenant',
         full_name: 'Admin Demo',
-        store_name: 'Sneaker Lab'
+        store_name: 'Kicks PDV'
       }
     };
     
@@ -138,13 +138,13 @@ export function createClient(): SupabaseClient {
           const parsed = JSON.parse(decodeURIComponent(match[1]));
           mockUser = {
             id: parsed.id || 'mock-user-id',
-            email: parsed.email || 'admin@sneakerlab.com',
+            email: parsed.email || 'admin@kickspdv.com',
             user_metadata: {
               username: parsed.username || 'admin',
               role: parsed.role || 'admin',
               tenant_id: parsed.tenant_id || 'mock-tenant',
               full_name: parsed.username || 'Admin Demo',
-              store_name: 'Sneaker Lab'
+              store_name: 'Kicks PDV'
             }
           };
         } catch {}

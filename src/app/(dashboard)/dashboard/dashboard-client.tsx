@@ -508,7 +508,7 @@ export default function DashboardClient({ initialSales, initialProducts }: Dashb
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
-    const filename = `Relatorio_Vendas_Sneaker_${day}-${month}-${year}.xlsx`;
+    const filename = `Relatorio_Vendas_Kicks_${day}-${month}-${year}.xlsx`;
 
     XLSX.writeFile(workbook, filename);
     toast.success('Relatório gerado com sucesso!');

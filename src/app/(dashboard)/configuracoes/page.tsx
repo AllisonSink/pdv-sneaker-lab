@@ -123,7 +123,7 @@ export default function ConfiguracoesPage() {
                 <label className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold mb-1 block">Nome da Filial</label>
                 <input 
                   type="text" 
-                  defaultValue="SNEAKER LAB - SÃO PAULO" 
+                  defaultValue="KICKS PDV - SÃO PAULO" 
                   className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900/10 focus:border-zinc-900 dark:focus:border-zinc-50"
                 />
               </div>

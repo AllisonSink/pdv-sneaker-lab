@@ -780,10 +780,10 @@ export default function PDVClient({ initialProducts }: { initialProducts: Produc
                   <h3 className="text-[10px] uppercase tracking-wider font-bold text-zinc-450 dark:text-zinc-500">Acessórios & Venda Rápida</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { id: 'kit-limpeza', name: 'Kit Limpeza Premium', price: 89, brand: 'Sneaker Lab' },
-                      { id: 'meias', name: 'Par de Meias', price: 45, brand: 'Sneaker Lab' },
-                      { id: 'cadarco', name: 'Cadarço Extra', price: 20, brand: 'Sneaker Lab' },
-                      { id: 'sacola', name: 'Sacola Presente', price: 10, brand: 'Sneaker Lab' }
+                      { id: 'kit-limpeza', name: 'Kit Limpeza Premium', price: 89, brand: 'Kicks PDV' },
+                      { id: 'meias', name: 'Par de Meias', price: 45, brand: 'Kicks PDV' },
+                      { id: 'cadarco', name: 'Cadarço Extra', price: 20, brand: 'Kicks PDV' },
+                      { id: 'sacola', name: 'Sacola Presente', price: 10, brand: 'Kicks PDV' }
                     ].map(item => (
                       <div
                         key={item.id}

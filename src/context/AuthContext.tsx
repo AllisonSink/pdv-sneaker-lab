@@ -37,13 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } else {
       // Injeta usuário mock imediatamente para destravar o desenvolvimento visual
-      setUser({
-        id: 'mock-123',
-        email: 'admin@sneakerlab.com',
-        username: 'Admin Sneaker Lab',
-        role: 'admin',
-        tenant_id: 'mock-tenant-id'
-      });
+        setUser({
+          id: 'mock-123',
+          email: 'admin@kickspdv.com',
+          username: 'Admin Kicks PDV',
+          role: 'admin',
+          tenant_id: 'mock-tenant-id'
+        });
     }
     setIsLoading(false);
   }, []);

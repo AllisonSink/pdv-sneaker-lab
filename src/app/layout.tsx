@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sneaker Lab - Frente de Caixa & PDV",
-  description: "Frente de Caixa (PDV) e Controle de Estoque de Grade para Sneaker Shops. Design premium e responsivo para PC e Smart POS.",
+  title: "Kicks PDV | Sistema de Gestão Premium",
+  description: "Frente de Caixa (PDV) e Controle de Estoque de Grade para Lojas de Sneakers e Streetwear. Design premium e responsivo para PC e Smart POS.",
 };
 
 export const viewport: Viewport = {

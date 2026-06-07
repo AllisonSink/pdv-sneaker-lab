@@ -315,12 +315,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             title={isSidebarExpanded ? "Recolher Menu" : "Expandir Menu"}
           >
             <div className="w-8.5 h-8.5 rounded-xl bg-zinc-900 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-900 font-bold shrink-0 shadow-md group-hover:scale-105 transition-transform">
-              S
+              K
             </div>
             <span className={`font-bold tracking-tight text-sm truncate transition-all duration-300 ease-in-out ${
               isSidebarExpanded ? 'opacity-100 max-w-[150px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'
             }`}>
-              Sneaker Lab
+              Kicks PDV
             </span>
           </div>
         </div>
@@ -477,9 +477,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="md:hidden h-16 bg-white dark:bg-zinc-950 border-b border-zinc-200/40 dark:border-zinc-900 px-4 flex items-center justify-between sticky top-0 z-40">
           <a href="/" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 relative z-50 p-2 -ml-2 cursor-pointer no-underline hover:no-underline hover:opacity-90 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-900 font-bold">
-              S
+              K
             </div>
-            <span className="font-bold tracking-tight text-sm text-zinc-900 dark:text-zinc-50">Sneaker Lab</span>
+            <span className="font-bold tracking-tight text-sm text-zinc-900 dark:text-zinc-50">Kicks PDV</span>
           </a>
 
           <div className="flex items-center gap-3">
@@ -681,7 +681,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </label>
               <input
                 type="email"
-                value={user?.email || "admin@sneakerlab.com"}
+                value={user?.email || "admin@kickspdv.com"}
                 disabled
                 className="w-full px-4 py-2.5 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-sm text-zinc-500 dark:text-zinc-500 cursor-not-allowed focus:outline-none select-none"
               />
@@ -722,7 +722,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Email Support Primary Action */}
             <a 
-              href="mailto:suporte@sneakerlab.com.br?subject=Dúvida%20-%20Sneaker%20Lab" 
+              href="mailto:suporte@kickspdv.com?subject=Dúvida%20-%20Kicks%20PDV" 
               className="w-full py-3.5 px-4 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-sm select-none"
             >
               <Mail className="w-4 h-4" />

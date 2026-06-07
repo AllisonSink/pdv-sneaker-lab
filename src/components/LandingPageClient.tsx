@@ -37,7 +37,7 @@ export default function LandingPageClient() {
     {
       id: 'pro',
       title: 'Plano Pro',
-      description: 'O padrão da indústria para sneaker shops em crescimento.',
+      description: 'O padrão da indústria para lojas de sneakers em crescimento.',
       price: isAnnual ? 'R$ 119,90' : 'R$ 149,90',
       period: '/mês',
       billingInfo: isAnnual ? 'Cobrado anualmente (R$ 1.438,80/ano)' : 'Cobrado mensalmente',
@@ -82,10 +82,10 @@ export default function LandingPageClient() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group select-none">
             <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:scale-105 transition-transform">
-              S
+              K
             </div>
             <span className="font-bold tracking-tight text-sm text-zinc-900">
-              Sneaker Lab
+              Kicks PDV
             </span>
           </Link>
 
@@ -319,7 +319,7 @@ export default function LandingPageClient() {
       <footer className="border-t border-zinc-200/60 bg-white">
         <div className="max-w-7xl mx-auto py-12 px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-500 font-medium">
           <div>
-            &copy; 2026 Sneaker Lab. Todos os direitos reservados.
+            &copy; 2026 Kicks PDV. Todos os direitos reservados.
           </div>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-zinc-900 transition-colors">Termos de Uso</a>

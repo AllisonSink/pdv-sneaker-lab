@@ -39,8 +39,8 @@ export const Receipt: React.FC<ReceiptProps> = ({
     >
       {/* Header */}
       <div className="text-center mb-4">
-        <h1 className="text-sm font-bold tracking-widest uppercase">SNEAKER LAB</h1>
-        <p className="text-[8px] uppercase opacity-75">Concept & Sneaker Shop</p>
+        <h1 className="text-sm font-bold tracking-widest uppercase">KICKS PDV</h1>
+        <p className="text-[8px] uppercase opacity-75">Concept & Kicks Shop</p>
         <p className="text-[8px] mt-1">Av. Paulista, 1000 - São Paulo/SP</p>
         <p className="text-[8px]">CNPJ: 12.345.678/0001-99</p>
         <p className="text-[8px]">TEL: (11) 3232-4040</p>
@@ -118,7 +118,7 @@ export const Receipt: React.FC<ReceiptProps> = ({
       {/* Footer / Barcode */}
       <div className="text-center space-y-2 mt-4">
         <p className="text-[9px] uppercase tracking-wide">Obrigado pela preferência!</p>
-        <p className="text-[8px] opacity-75">Desenvolvido por Sneaker Lab OS</p>
+        <p className="text-[8px] opacity-75">Desenvolvido por Kicks PDV OS</p>
         
         {/* Simulated Thermal Ticket Barcode */}
         <div className="flex flex-col items-center justify-center pt-2">

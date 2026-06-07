@@ -125,13 +125,13 @@ export async function createClient(): Promise<SupabaseClient> {
   if (isMockMode) {
     let mockUser = {
       id: 'mock-user-id',
-      email: 'admin@sneakerlab.com',
+      email: 'admin@kickspdv.com',
       user_metadata: {
         username: 'admin',
         role: 'admin',
         tenant_id: 'mock-tenant',
         full_name: 'Admin Demo',
-        store_name: 'Sneaker Lab'
+        store_name: 'Kicks PDV'
       }
     };
     
@@ -140,13 +140,13 @@ export async function createClient(): Promise<SupabaseClient> {
         const parsed = JSON.parse(decodeURIComponent(mockUserCookie));
         mockUser = {
           id: parsed.id || 'mock-user-id',
-          email: parsed.email || 'admin@sneakerlab.com',
+          email: parsed.email || 'admin@kickspdv.com',
           user_metadata: {
             username: parsed.username || 'admin',
             role: parsed.role || 'admin',
             tenant_id: parsed.tenant_id || 'mock-tenant',
             full_name: parsed.username || 'Admin Demo',
-            store_name: 'Sneaker Lab'
+            store_name: 'Kicks PDV'
           }
         };
       } catch {}
