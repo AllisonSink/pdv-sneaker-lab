@@ -15,6 +15,7 @@ export default function RegisterCheckoutPage() {
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   
   const pixCode = "00020101021126360014br.gov.bcb.pix0114614882330001705204000053039865406119.905802BR592561.488.233 ALLISON DE JES6009SAO PAULO622905251KTHPYWHD84FPAB3Z5TYNX2YS63048B2A";
 
@@ -60,6 +61,20 @@ export default function RegisterCheckoutPage() {
       return () => clearTimeout(timer);
     }
   }, [step, paymentConfirmed]);
+
+  // Calculate password strength in real time
+  useEffect(() => {
+    let score = 0;
+    if (!password) {
+      setPasswordStrength(0);
+      return;
+    }
+    if (password.length >= 6) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    setPasswordStrength(score);
+  }, [password]);
 
   const handleFinalize = () => {
     // Save mock user session to localstorage and cookie
@@ -272,6 +287,43 @@ export default function RegisterCheckoutPage() {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                  
+                  {/* Dynamic Password Strength Meter */}
+                  {password && (
+                    <div className="mt-2 space-y-1.5 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-4 gap-1">
+                        {[1, 2, 3, 4].map((barIndex) => {
+                          let barColor = 'bg-zinc-200 dark:bg-zinc-800';
+                          if (passwordStrength >= barIndex) {
+                            if (passwordStrength === 1) barColor = 'bg-red-500';
+                            else if (passwordStrength === 2) barColor = 'bg-amber-500';
+                            else if (passwordStrength === 3) barColor = 'bg-lime-500';
+                            else if (passwordStrength === 4) barColor = 'bg-emerald-500';
+                          }
+                          return (
+                            <div
+                              key={barIndex}
+                              className={`h-1 rounded-full transition-colors duration-300 ${barColor}`}
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider select-none">
+                        <span>Força da Senha</span>
+                        <span className={`
+                          ${passwordStrength <= 1 ? 'text-red-500' : ''}
+                          ${passwordStrength === 2 ? 'text-amber-500' : ''}
+                          ${passwordStrength === 3 ? 'text-lime-500' : ''}
+                          ${passwordStrength === 4 ? 'text-emerald-500' : ''}
+                        `}>
+                          {passwordStrength <= 1 && 'Senha muito fraca'}
+                          {passwordStrength === 2 && 'Senha média'}
+                          {passwordStrength === 3 && 'Senha boa'}
+                          {passwordStrength === 4 && 'Senha forte'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Plano Recurrente (Resumo Discreto) */}
