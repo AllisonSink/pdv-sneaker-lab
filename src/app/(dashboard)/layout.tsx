@@ -17,7 +17,9 @@ import {
   HelpCircle,
   MessageCircle,
   Bell,
-  History
+  History,
+  Camera,
+  Mail
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -640,7 +642,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               />
               <label 
                 htmlFor="avatar-upload"
-                className="block w-24 h-24 rounded-full border-2 border-dashed border-zinc-250 dark:border-zinc-800 hover:border-zinc-450 dark:hover:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-col items-center justify-center overflow-hidden cursor-pointer relative group transition-all"
+                className="block w-24 h-24 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-col items-center justify-center overflow-hidden cursor-pointer relative group transition-all"
               >
                 {tempAvatar ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
@@ -652,14 +654,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 )}
                 {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity">
-                  Alterar
+                <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200">
+                  <Camera className="w-5 h-5" />
                 </div>
               </label>
             </div>
 
             {/* Name Input */}
-            <div className="w-full space-y-2 mb-8">
+            <div className="w-full space-y-2 mb-4">
               <label className="text-[10px] text-zinc-450 dark:text-zinc-500 uppercase font-semibold text-left block">
                 Nome de Exibição
               </label>
@@ -669,6 +671,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onChange={(e) => setTempName(e.target.value)}
                 className="w-full px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-50/10 focus:border-zinc-900 dark:focus:border-zinc-50 transition-all placeholder-zinc-400 dark:placeholder-zinc-600"
                 placeholder="Seu nome de exibição"
+              />
+            </div>
+
+            {/* Email Input */}
+            <div className="w-full space-y-2 mb-8">
+              <label className="text-[10px] text-zinc-450 dark:text-zinc-500 uppercase font-semibold text-left block">
+                E-mail de Acesso
+              </label>
+              <input
+                type="email"
+                value={user?.email || "admin@sneakerlab.com"}
+                disabled
+                className="w-full px-4 py-2.5 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl text-base md:text-sm text-zinc-500 dark:text-zinc-500 cursor-not-allowed focus:outline-none select-none"
               />
             </div>
 
@@ -705,15 +720,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Escolha um canal de atendimento ou reporte um problema no sistema.
             </p>
 
-            {/* WhatsApp Primary Action */}
+            {/* Email Support Primary Action */}
             <a 
-              href="https://wa.me/5511999999999" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full py-3.5 px-4 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.1] active:bg-emerald-500/[0.15] dark:bg-emerald-500/[0.06] dark:hover:bg-emerald-500/[0.1] border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-sm select-none"
+              href="mailto:suporte@sneakerlab.com.br?subject=Dúvida%20-%20Sneaker%20Lab" 
+              className="w-full py-3.5 px-4 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-sm select-none"
             >
-              <MessageCircle className="w-4 h-4" />
-              Fale Conosco (WhatsApp)
+              <Mail className="w-4 h-4" />
+              Suporte via E-mail
             </a>
 
             {/* Divider */}
