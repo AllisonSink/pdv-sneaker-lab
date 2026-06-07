@@ -46,7 +46,8 @@ function parseBRL(formattedValue: string): number {
   return parseInt(cleanValue, 10) / 100;
 }
 
-const AVAILABLE_SIZES = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+const ADULT_SIZES = ['33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46'];
+const KIDS_SIZES = ['18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32'];
 
 export default function EstoqueClient({ initialProducts }: { initialProducts: Product[] }) {
   const { user } = useAuth();
@@ -82,6 +83,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
   const [addPriceCost, setAddPriceCost] = useState('');
   const [addPrice, setAddPrice] = useState('');
   const [addError, setAddError] = useState('');
+  const [sizeCategory, setSizeCategory] = useState<'adulto' | 'infantil'>('adulto');
 
   // Image Upload for Add Modal
   const [addFormImageUrl, setAddFormImageUrl] = useState('');
@@ -990,10 +992,39 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
               </div>
 
               {/* Grade de Tamanhos & Lógica de Quantidade */}
-              <div className="space-y-2">
-                <label className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-semibold block">Grade de Tamanhos & Estoque</label>
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-semibold block">Grade de Tamanhos & Estoque</label>
+                  
+                  {/* Segmented Control / Tabs */}
+                  <div className="bg-zinc-100 dark:bg-zinc-900/60 p-0.5 rounded-lg flex items-center gap-0.5 shrink-0 border border-zinc-200/10">
+                    <button
+                      type="button"
+                      onClick={() => setSizeCategory('adulto')}
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                        sizeCategory === 'adulto'
+                          ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                          : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 bg-transparent'
+                      }`}
+                    >
+                      Adulto
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSizeCategory('infantil')}
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                        sizeCategory === 'infantil'
+                          ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                          : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 bg-transparent'
+                      }`}
+                    >
+                      Infantil
+                    </button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-52 overflow-y-auto p-1.5 border border-zinc-250/20 dark:border-zinc-850 rounded-2xl bg-zinc-50/20 dark:bg-zinc-900/10">
-                  {AVAILABLE_SIZES.map(size => {
+                  {(sizeCategory === 'adulto' ? ADULT_SIZES : KIDS_SIZES).map(size => {
                     const isSelected = size in addSizeStocks;
                     const qty = addSizeStocks[size] ?? '';
                     return (
@@ -1002,7 +1033,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                         className={`flex flex-col p-2 rounded-xl border transition-all ${
                           isSelected 
                             ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-zinc-50 dark:border-zinc-50 dark:text-zinc-950 shadow-sm shadow-zinc-900/10 dark:shadow-zinc-50/5' 
-                            : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-500 hover:text-zinc-800 dark:bg-zinc-950 dark:border-zinc-850 dark:text-zinc-450 dark:hover:bg-zinc-900/60'
+                            : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-500 hover:text-zinc-800 dark:bg-zinc-955 dark:border-zinc-850 dark:text-zinc-450 dark:hover:bg-zinc-900/60'
                         }`}
                       >
                         <button
@@ -1110,7 +1141,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
 
                 {/* Section 1: Informações Básicas */}
                 <div className="space-y-4">
-                  <h3 className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider mb-2 flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-zinc-500 tracking-wider uppercase mb-3 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     Informações Básicas do Tênis
                   </h3>
@@ -1206,7 +1237,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
 
                   {/* Photo Real Upload Section */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold block">Foto do Tênis</label>
+                    <label className="text-xs font-semibold text-zinc-500 tracking-wider uppercase mb-3 block">Foto do Tênis</label>
                     
                     <input 
                       type="file" 
@@ -1265,7 +1296,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                 {/* Section 2: Gerenciamento de Grade */}
                 <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-900">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider flex items-center gap-1.5">
+                    <h3 className="text-xs font-semibold text-zinc-500 tracking-wider uppercase mb-3 flex items-center gap-1.5">
                       <Barcode className="w-3.5 h-3.5" />
                       Grade de Tamanhos
                     </h3>
@@ -1283,9 +1314,9 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                     {formSizes.map((sz, idx) => (
                       <div 
                         key={idx}
-                        className="p-3 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/20 dark:border-zinc-850 rounded-2xl flex items-center gap-2 animate-in slide-in-from-top-1 duration-150 relative"
+                        className="p-3 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/20 dark:border-zinc-850 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-1 duration-150 relative"
                       >
-                        <div className="grid grid-cols-12 gap-2 flex-1">
+                        <div className="grid grid-cols-12 gap-4 flex-1">
                           
                           {/* Tamanho */}
                           <div className="col-span-3">
@@ -1333,7 +1364,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                           type="button"
                           onClick={() => removeFormSizeRow(idx)}
                           disabled={formSizes.length <= 1}
-                          className="mt-4 p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-955/20 rounded-lg shrink-0 disabled:opacity-40 cursor-pointer"
+                          className="mt-4 p-1.5 ml-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-955/20 rounded-lg shrink-0 disabled:opacity-40 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1350,7 +1381,7 @@ export default function EstoqueClient({ initialProducts }: { initialProducts: Pr
                   <button
                     type="button"
                     onClick={() => handleDeleteProduct(editingProduct.id)}
-                    className="py-2.5 px-4 text-xs font-semibold text-red-505 hover:bg-red-50 dark:hover:bg-red-955/20 rounded-xl flex items-center gap-1.5 transition-colors active:scale-98 cursor-pointer"
+                    className="py-2.5 px-4 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-955/20 rounded-xl flex items-center gap-1.5 transition-colors active:scale-98 cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" /> Excluir
                   </button>
