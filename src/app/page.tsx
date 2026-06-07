@@ -175,6 +175,15 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans antialiased selection:bg-zinc-150 flex flex-col">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes mockFadeIn {
+          from { opacity: 0; transform: translateY(1px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-quick {
+          animation: mockFadeIn 0.15s ease-out forwards;
+        }
+      `}} />
       
       {/* 1. Header/Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-zinc-100 bg-white/90 backdrop-blur-md transition-all select-none">
@@ -254,7 +263,7 @@ export default function LandingPage() {
 
           {/* Real-time simulation warning label */}
           <div className="text-[10px] tracking-wider uppercase font-bold text-zinc-400 select-none mb-2.5 animate-pulse">
-            SIMULAÇÃO EM TEMPO REAL (DADOS FICTÍCIOS)
+            SIMULAÇÃO DE NAVEGAÇÃO (DADOS FICTÍCIOS)
           </div>
 
           {/* 2.1 Dashboard App Mockup Container (Interactive Walkthrough Simulation) */}
@@ -265,7 +274,9 @@ export default function LandingPage() {
               className="absolute pointer-events-none z-50 text-zinc-950 transition-all duration-75 ease-out" 
               style={{ left: `${cursorState.x}%`, top: `${cursorState.y}%` }}
             >
-              <MousePointer className="w-5 h-5 drop-shadow-md fill-zinc-955 stroke-white stroke-2" />
+              <svg className="w-5 h-5 drop-shadow-md" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.65376 1.83618C5.23961 1.01784 4.02641 1.20571 3.87679 2.11585L1.08518 19.099C0.923838 20.0805 2.01633 20.7307 2.76672 20.0526L8.52843 14.8465L14.7788 22.3789C15.2289 22.9213 16.0592 22.9904 16.5959 22.5298L19.5298 20.0096C20.0664 19.5491 20.099 18.7236 19.6006 18.2252L13.4332 12.0578L20.8927 8.32804C21.7588 7.89498 21.6841 6.62104 20.7714 6.29177L5.65376 1.83618Z" fill="#09090b" stroke="white" strokeWidth="2" strokeLinejoin="round"/>
+              </svg>
             </div>
 
             {/* Window Controls (Mac style) */}
@@ -280,54 +291,54 @@ export default function LandingPage() {
             <div className="w-full h-[calc(100%-20px)] rounded-2xl bg-white border border-zinc-200/60 flex overflow-hidden shadow-inner relative">
               
               {/* Mock Sidebar */}
-              <div className="w-44 bg-zinc-50 border-r border-zinc-100 p-4 flex flex-col justify-between hidden md:flex text-left">
+              <div className="w-44 bg-zinc-955 text-zinc-400 border-r border-zinc-900 p-4 flex flex-col justify-between hidden md:flex text-left">
                 <div className="space-y-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-zinc-900 flex items-center justify-center text-white font-black text-xs">K</div>
-                    <span className="font-extrabold text-[11px] text-zinc-900 tracking-tight">Kicks PDV</span>
+                    <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-zinc-955 font-black text-xs">K</div>
+                    <span className="font-extrabold text-[11px] text-white tracking-tight">Kicks PDV</span>
                   </div>
                   <div className="space-y-1">
-                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all ${
+                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                       isDashboardActive 
-                        ? 'bg-zinc-900 text-white' 
+                        ? 'bg-zinc-900 text-white shadow-xs' 
                         : (isDashboardHovered || isDashboardClicked) 
-                          ? 'bg-zinc-200/60 text-zinc-900 scale-98' 
-                          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800'
+                          ? 'bg-zinc-800 text-white scale-98' 
+                          : 'text-zinc-400 hover:bg-zinc-900/60 hover:text-white'
                     }`}>
                       Dashboard
                     </div>
-                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all ${
+                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                       isPDVActive 
-                        ? 'bg-zinc-900 text-white' 
+                        ? 'bg-zinc-900 text-white shadow-xs' 
                         : (isPDVHovered || isPDVClicked) 
-                          ? 'bg-zinc-200/60 text-zinc-900 scale-98' 
-                          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800'
+                          ? 'bg-zinc-800 text-white scale-98' 
+                          : 'text-zinc-400 hover:bg-zinc-900/60 hover:text-white'
                     }`}>
                       Frente de Caixa (PDV)
                     </div>
-                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all ${
+                    <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                       isEstoqueActive 
-                        ? 'bg-zinc-900 text-white' 
+                        ? 'bg-zinc-900 text-white shadow-xs' 
                         : (isEstoqueHovered || isEstoqueClicked) 
-                          ? 'bg-zinc-200/60 text-zinc-900 scale-98' 
-                          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800'
+                          ? 'bg-zinc-800 text-white scale-98' 
+                          : 'text-zinc-400 hover:bg-zinc-900/60 hover:text-white'
                     }`}>
                       Estoque de Grade
                     </div>
-                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800">
+                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-400 hover:bg-zinc-900/60 hover:text-white cursor-pointer">
                       Histórico de Vendas
                     </div>
-                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800">
+                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-400 hover:bg-zinc-900/60 hover:text-white cursor-pointer">
                       Equipe e PINs
                     </div>
-                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800">
+                    <div className="px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-zinc-400 hover:bg-zinc-900/60 hover:text-white cursor-pointer">
                       Configurações
                     </div>
                   </div>
                 </div>
-                <div className="p-2.5 bg-zinc-100 rounded-xl border border-zinc-200/40 text-left">
-                  <span className="text-[7px] text-zinc-400 font-bold block uppercase tracking-wider">Período de Teste</span>
-                  <span className="text-[9px] text-zinc-850 font-black mt-0.5 block">Trial: 7 dias restantes</span>
+                <div className="p-2.5 bg-zinc-900 rounded-xl border border-zinc-800/80 text-left">
+                  <span className="text-[7px] text-zinc-500 font-bold block uppercase tracking-wider">Período de Teste</span>
+                  <span className="text-[9px] text-zinc-200 font-black mt-0.5 block">Trial: 7 dias restantes</span>
                 </div>
               </div>
 
@@ -335,7 +346,7 @@ export default function LandingPage() {
               <div className="flex-1 bg-zinc-50/20 p-4 md:p-5 overflow-hidden flex flex-col justify-between text-left relative">
                 
                 {activeScreen === 'dashboard' && (
-                  <div className="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full animate-in fade-in duration-200">
+                  <div className="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full animate-fade-in-quick">
                     {/* Header */}
                     <div className="flex justify-between items-center pb-3 border-b border-zinc-100">
                       <div>
@@ -365,7 +376,7 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 1.899,80</h3>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 45.680,00</h3>
                           <p className="text-[7px] text-zinc-455 mt-1 flex items-center gap-0.5">
                             <TrendingUp className="w-2.5 h-2.5 text-emerald-500" />
                             <span className="text-emerald-550 font-semibold">Receita consolidada</span>
@@ -381,8 +392,8 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">1 pedido</h3>
-                          <p className="text-[7px] text-zinc-450 mt-1">Transações efetuadas</p>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">64 pedidos</h3>
+                          <p className="text-[7px] text-zinc-455 mt-1">Transações efetuadas</p>
                         </div>
                       </div>
 
@@ -394,8 +405,8 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 1.899,80</h3>
-                          <p className="text-[7px] text-zinc-450 mt-1">Média por transação</p>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 713,75</h3>
+                          <p className="text-[7px] text-zinc-455 mt-1">Média por transação</p>
                         </div>
                       </div>
 
@@ -408,8 +419,8 @@ export default function LandingPage() {
                         </div>
                         <div className="mt-1">
                           <div className="flex items-baseline justify-between">
-                            <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 1.899,80</h3>
-                            <span className="text-[6.5px] text-zinc-450">meta: R$ 1.200</span>
+                            <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 45.680,00</h3>
+                            <span className="text-[6.5px] text-zinc-450">meta: R$ 40.000</span>
                           </div>
                           <div className="w-full bg-zinc-100 h-1 rounded-full mt-1.5 overflow-hidden">
                             <div className="h-full bg-gradient-to-r from-amber-400 to-amber-550 rounded-full w-full" />
@@ -457,14 +468,14 @@ export default function LandingPage() {
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 <span>PIX</span>
                               </div>
-                              <span className="font-semibold text-zinc-800">R$ 1.200,00 (63%)</span>
+                              <span className="font-semibold text-zinc-800">R$ 28.778,40 (63%)</span>
                             </div>
                             <div className="flex items-center justify-between text-[7px]">
                               <div className="flex items-center gap-1 text-zinc-555">
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 <span>Cartão</span>
                               </div>
-                              <span className="font-semibold text-zinc-800">R$ 699,80 (37%)</span>
+                              <span className="font-semibold text-zinc-800">R$ 16.901,60 (37%)</span>
                             </div>
                             <div className="flex items-center justify-between text-[7px]">
                               <div className="flex items-center gap-1 text-zinc-550">
@@ -481,7 +492,7 @@ export default function LandingPage() {
                 )}
 
                 {activeScreen === 'pdv' && (
-                  <div className="flex-1 flex flex-col justify-between h-full overflow-hidden animate-in fade-in duration-200">
+                  <div className="flex-1 flex flex-col justify-between h-full overflow-hidden animate-fade-in-quick">
                     <div className="flex justify-between items-center pb-2 border-b border-zinc-100 px-1">
                       <div>
                         <h4 className="text-xs font-bold tracking-tight text-zinc-900">Frente de Caixa (PDV)</h4>
@@ -540,22 +551,22 @@ export default function LandingPage() {
                           <div className="space-y-1.5 max-h-20 overflow-y-auto mb-2 pr-0.5">
                             <div className="flex items-center justify-between text-[7.5px] bg-white p-1.5 rounded-md border border-zinc-100 shadow-xs">
                               <div className="truncate max-w-[65px]">
-                                <span className="font-bold text-zinc-900 block truncate">Air Force 1 Supreme</span>
+                                <span className="font-bold text-zinc-900 block truncate">Air Force 1</span>
                                 <span className="text-[6.5px] text-zinc-400 font-mono">T41 • AF-1-SUP-41</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <span className="text-zinc-500 font-medium">1x</span>
-                                <span className="font-bold text-zinc-900">R$ 1.899</span>
+                                <span className="font-bold text-zinc-900">R$ 750</span>
                               </div>
                             </div>
                             <div className="flex items-center justify-between text-[7.5px] bg-white p-1.5 rounded-md border border-zinc-100 shadow-xs">
                               <div className="truncate max-w-[65px]">
-                                <span className="font-bold text-zinc-900 block truncate">Sacola Presente</span>
-                                <span className="text-[6.5px] text-zinc-400 font-mono">TU • SKU-SACOLA</span>
+                                <span className="font-bold text-zinc-900 block truncate">Jordan 1 High</span>
+                                <span className="text-[6.5px] text-zinc-400 font-mono">T40 • AJ-1-CHI-40</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <span className="text-zinc-500 font-medium">1x</span>
-                                <span className="font-bold text-zinc-900">R$ 10</span>
+                                <span className="font-bold text-zinc-900">R$ 450</span>
                               </div>
                             </div>
                           </div>
@@ -604,16 +615,16 @@ export default function LandingPage() {
                           <div className="space-y-0.5 text-[7px] text-zinc-500">
                             <div className="flex justify-between font-medium">
                               <span>Subtotal</span>
-                              <span>R$ 1.909,00</span>
+                              <span>R$ 1.200,00</span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Desconto</span>
-                              <span>R$ 9,20</span>
+                              <span>R$ 0,00</span>
                             </div>
                           </div>
                           <div className="flex justify-between items-end my-1">
                             <span className="text-[8px] font-bold text-zinc-900">Total</span>
-                            <span className="text-xs font-black text-zinc-950">R$ 1.899,80</span>
+                            <span className="text-xs font-black text-zinc-955">R$ 1.200,00</span>
                           </div>
                           
                           <button 
@@ -632,7 +643,7 @@ export default function LandingPage() {
                 )}
 
                 {activeScreen === 'estoque' && (
-                  <div className="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full animate-in fade-in duration-200">
+                  <div className="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full animate-fade-in-quick">
                     <div className="flex justify-between items-center pb-2 border-b border-zinc-100 px-1">
                       <div>
                         <h4 className="text-xs font-bold tracking-tight text-zinc-900">Estoque de Grade</h4>
@@ -678,7 +689,7 @@ export default function LandingPage() {
                       <div className="bg-white border border-zinc-150 rounded-xl p-3 shadow-xs">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200/30 shrink-0 overflow-hidden flex items-center justify-center font-black text-zinc-405 text-[8px]">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-100 to-zinc-200/70 border border-zinc-200/30 shrink-0 overflow-hidden flex items-center justify-center font-black text-zinc-450 text-[8px] shadow-xs">
                               AF1
                             </div>
                             <div>
@@ -693,14 +704,14 @@ export default function LandingPage() {
                               <span className="text-[9.5px] font-black text-zinc-900">5 pares</span>
                             </div>
                             <button 
-                              className={`py-1 px-2 border rounded-lg text-[8.5px] font-semibold flex items-center gap-1 transition-all ${
+                              className={`py-1 px-2.5 border rounded-lg text-[8.5px] font-semibold flex items-center gap-1 transition-all ${
                                 (animTime >= 10.2 && animTime < 12.0) 
-                                  ? 'bg-zinc-950 border-zinc-950 text-white font-black scale-98 shadow-sm' 
+                                  ? 'bg-zinc-950 border-zinc-955 text-white font-black scale-98 shadow-sm' 
                                   : 'border-zinc-200 text-zinc-700 bg-white'
                               }`}
                             >
                               <Edit className="w-2.5 h-2.5" />
-                              <span>Grade / Editar</span>
+                              <span>Editar</span>
                             </button>
                           </div>
                         </div>
@@ -734,7 +745,7 @@ export default function LandingPage() {
                       <div className="bg-white border border-zinc-150 rounded-xl p-3 shadow-xs opacity-90">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200/30 shrink-0 overflow-hidden flex items-center justify-center font-black text-zinc-405 text-[8px]">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-100 to-zinc-200/70 border border-zinc-200/30 shrink-0 overflow-hidden flex items-center justify-center font-black text-zinc-450 text-[8px] shadow-xs">
                               YZY
                             </div>
                             <div>
@@ -748,9 +759,9 @@ export default function LandingPage() {
                               <span className="text-[6.5px] text-zinc-400 font-bold block uppercase tracking-wider">Estoque Global</span>
                               <span className="text-[9.5px] font-black text-zinc-900">12 pares</span>
                             </div>
-                            <button className="py-1 px-2 border border-zinc-200 text-zinc-700 bg-white rounded-lg text-[8.5px] font-semibold flex items-center gap-1">
+                            <button className="py-1 px-2.5 border border-zinc-200 text-zinc-700 bg-white rounded-lg text-[8.5px] font-semibold flex items-center gap-1">
                               <Edit className="w-2.5 h-2.5" />
-                              <span>Grade / Editar</span>
+                              <span>Editar</span>
                             </button>
                           </div>
                         </div>
