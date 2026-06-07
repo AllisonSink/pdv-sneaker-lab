@@ -218,8 +218,8 @@ export default function TeamPage() {
                         </div>
                         <div>
                           <span className="block font-bold">{member.name}</span>
-                          <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-mono mt-0.5">
-                            <Lock className="w-2.5 h-2.5" /> PIN: {member.pin}
+                          <span className="text-[10px] text-zinc-450 dark:text-zinc-500 flex items-center gap-1 font-mono mt-0.5">
+                            <Lock className="w-2.5 h-2.5" /> PIN: ****
                           </span>
                         </div>
                       </div>
