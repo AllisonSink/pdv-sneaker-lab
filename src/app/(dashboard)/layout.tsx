@@ -399,8 +399,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {isSidebarExpanded && (
             <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">Plano Básico</span>
-                <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-50">Grátis</span>
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">Período de Teste</span>
+                <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-50">7 Dias</span>
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Desbloqueie todos os recursos.</p>
               <button 
