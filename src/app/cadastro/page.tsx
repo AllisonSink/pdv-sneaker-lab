@@ -1,19 +1,33 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Lock, Mail, User, Store, ArrowLeft, Copy, Check, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, User, Store, ArrowLeft, Copy, Check, Eye, EyeOff, Phone } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Mask helper for WhatsApp (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+const formatWhatsApp = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length === 0) return '';
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
 
 export default function RegisterCheckoutPage() {
   const [step, setStep] = useState(1);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [whatsappClean, setWhatsappClean] = useState('');
   const [storeName, setStoreName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   
   const [copied, setCopied] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   
@@ -30,7 +44,7 @@ export default function RegisterCheckoutPage() {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim() || !storeName.trim() || !password) {
+    if (!fullName.trim() || !email.trim() || !whatsappClean.trim() || !storeName.trim() || !password || !confirmPassword) {
       toast.error('Por favor, preencha todos os campos.');
       return;
     }
@@ -38,8 +52,16 @@ export default function RegisterCheckoutPage() {
       toast.error('Por favor, insira um e-mail válido.');
       return;
     }
+    if (whatsappClean.length < 10) {
+      toast.error('Por favor, insira um WhatsApp válido com DDD.');
+      return;
+    }
     if (password.length < 6) {
       toast.error('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error('As senhas não coincidem.');
       return;
     }
     
@@ -82,6 +104,7 @@ export default function RegisterCheckoutPage() {
       id: 'mock-' + Math.random().toString(36).substr(2, 9),
       username: fullName || email.split('@')[0],
       email: email,
+      whatsapp: whatsappClean,
       role: 'admin',
       tenant_id: storeName.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'mock-tenant-id'
     };
@@ -246,6 +269,29 @@ export default function RegisterCheckoutPage() {
                   </div>
                 </div>
 
+                {/* WhatsApp */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="whatsapp" className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-bold tracking-wider">
+                    WhatsApp (com DDD)
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-505" />
+                    <input
+                      id="whatsapp"
+                      type="text"
+                      placeholder="(11) 99999-9999"
+                      value={whatsapp}
+                      onChange={(e) => {
+                        const formatted = formatWhatsApp(e.target.value);
+                        setWhatsapp(formatted);
+                        setWhatsappClean(e.target.value.replace(/\D/g, '').slice(0, 11));
+                      }}
+                      className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/40 dark:border-zinc-800/40 rounded-xl text-base md:text-sm focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-455 dark:placeholder-zinc-600"
+                      required
+                    />
+                  </div>
+                </div>
+
                 {/* Nome da Loja */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="storeName" className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-bold tracking-wider">
@@ -328,11 +374,44 @@ export default function RegisterCheckoutPage() {
                   )}
                 </div>
 
+                {/* Confirmação de Senha */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="confirmPassword" className="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-bold tracking-wider">
+                    Confirme sua Senha
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-505" />
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Repita a senha de acesso"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-10 pr-11 py-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/40 dark:border-zinc-800/40 rounded-xl text-base md:text-sm focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-50 focus:border-zinc-950 dark:focus:border-zinc-50 transition-all placeholder-zinc-455 dark:placeholder-zinc-600"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-450 hover:text-zinc-650 dark:hover:text-zinc-350 transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  
+                  {/* Validation Error Message */}
+                  {confirmPassword && password !== confirmPassword && (
+                    <span className="text-xs text-red-500 font-medium mt-1 animate-in fade-in duration-200">
+                      As senhas não coincidem.
+                    </span>
+                  )}
+                </div>
+
                 {/* Plano Recurrente (Resumo Discreto) */}
                 <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150/45 dark:border-zinc-800/30 rounded-2xl select-none">
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Plano Premium</span>
-                    <span className="text-[10px] text-zinc-450 dark:text-zinc-500 font-medium">Cobrança recorrente via Pix</span>
+                    <span className="text-[10px] text-zinc-455 dark:text-zinc-500 font-medium">Cobrança recorrente via Pix</span>
                   </div>
                   <span className="text-xs font-black text-zinc-900 dark:text-zinc-50">R$ 119,90 / mês</span>
                 </div>
@@ -340,8 +419,8 @@ export default function RegisterCheckoutPage() {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 bg-zinc-950 hover:bg-zinc-900 active:bg-black dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl transition-all duration-200 shadow-md active:scale-[0.99] select-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || !fullName.trim() || !email.trim() || !whatsappClean.trim() || !storeName.trim() || !password || !confirmPassword || password !== confirmPassword}
+                  className="w-full py-3.5 bg-zinc-955 hover:bg-zinc-850 active:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:active:bg-zinc-100 text-white dark:text-zinc-955 font-bold rounded-xl transition-all duration-200 shadow-md active:scale-[0.99] select-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <span className="w-4 h-4 border-2 border-white dark:border-zinc-955 border-t-transparent dark:border-t-transparent rounded-full animate-spin" />
