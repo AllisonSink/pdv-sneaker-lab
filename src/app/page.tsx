@@ -36,10 +36,13 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
   const [animTime, setAnimTime] = useState(0);
 
-  // Run the walkthrough animation loop (0s to 13s)
+  // Run the walkthrough animation loop (0s to 10s)
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnimTime((prev) => (prev >= 13 ? 0 : prev + 0.1));
+      setAnimTime((prev) => {
+        const next = Math.round((prev + 0.1) * 10) / 10;
+        return next >= 10 ? 0 : next;
+      });
     }, 100);
     return () => clearInterval(interval);
   }, []);
@@ -49,50 +52,27 @@ export default function LandingPage() {
     let x = 40;
     let y = 40;
     
-    if (animTime >= 0 && animTime < 1.5) {
-      const t = animTime / 1.5;
-      x = 40 + (25 - 40) * t;
-      y = 40 + (30 - 40) * t;
-    } else if (animTime >= 1.5 && animTime < 3.0) {
-      const t = (animTime - 1.5) / 1.5;
-      x = 25 + (35 - 25) * t;
-      y = 30 + (50 - 30) * t;
-    } else if (animTime >= 3.0 && animTime < 4.2) {
-      const t = (animTime - 3.0) / 1.2;
-      x = 35 + (8 - 35) * t;
-      y = 50 + (21 - 50) * t;
-    } else if (animTime >= 4.2 && animTime < 4.5) {
+    if (animTime >= 0 && animTime < 2.7) {
+      const t = animTime / 2.7;
+      x = 40 + (8 - 40) * t;
+      y = 40 + (21 - 40) * t;
+    } else if (animTime >= 2.7 && animTime < 3.2) {
       x = 8;
       y = 21;
-    } else if (animTime >= 4.5 && animTime < 6.5) {
-      const t = (animTime - 4.5) / 2.0;
+    } else if (animTime >= 3.2 && animTime < 5.8) {
+      const t = (animTime - 3.2) / 2.6;
       x = 8 + (85 - 8) * t;
       y = 21 + (87 - 21) * t;
-    } else if (animTime >= 6.5 && animTime < 7.5) {
+    } else if (animTime >= 5.8 && animTime < 6.5) {
       x = 85;
       y = 87;
-    } else if (animTime >= 7.5 && animTime < 8.7) {
-      const t = (animTime - 7.5) / 1.2;
-      x = 85 + (8 - 85) * t;
-      y = 87 + (27 - 87) * t;
-    } else if (animTime >= 8.7 && animTime < 9.0) {
-      x = 8;
-      y = 27;
-    } else if (animTime >= 9.0 && animTime < 10.2) {
-      const t = (animTime - 9.0) / 1.2;
-      x = 8 + (50 - 8) * t;
-      y = 27 + (45 - 27) * t;
-    } else if (animTime >= 10.2 && animTime < 12.0) {
-      const t = (animTime - 10.2) / 1.8;
-      x = 50 + (90 - 50) * t;
-      y = 45 + (24 - 45) * t;
-    } else if (animTime >= 12.0 && animTime < 12.7) {
-      const t = (animTime - 12.0) / 0.7;
-      x = 90 + (8 - 90) * t;
-      y = 24 + (15 - 24) * t;
-    } else if (animTime >= 12.7 && animTime <= 13.0) {
-      x = 8;
-      y = 15;
+    } else if (animTime >= 6.5 && animTime < 8.5) {
+      const t = (animTime - 6.5) / 2.0;
+      x = 85 + (40 - 85) * t;
+      y = 87 + (40 - 87) * t;
+    } else {
+      x = 40;
+      y = 40;
     }
     return { x, y };
   };
@@ -100,21 +80,32 @@ export default function LandingPage() {
   const cursorState = getCursorPosition();
 
   // Screen state derivation based on animTime
-  const activeScreen = animTime < 4.5 ? 'dashboard' : animTime < 9.0 ? 'pdv' : animTime < 12.7 ? 'estoque' : 'dashboard';
+  const activeScreen = (animTime < 3.0 ? 'dashboard' : animTime < 6.5 ? 'pdv' : 'dashboard') as 'dashboard' | 'pdv' | 'estoque';
 
   const isDashboardActive = activeScreen === 'dashboard';
   const isPDVActive = activeScreen === 'pdv';
-  const isEstoqueActive = activeScreen === 'estoque';
+  const isEstoqueActive = false;
 
-  const isDashboardHovered = (animTime >= 12.0 && animTime < 12.7);
-  const isPDVHovered = (animTime >= 3.6 && animTime < 4.2);
-  const isEstoqueHovered = (animTime >= 8.1 && animTime < 8.7);
+  const isDashboardHovered = false;
+  const isPDVHovered = (animTime >= 2.2 && animTime < 2.8);
+  const isEstoqueHovered = false;
 
-  const isDashboardClicked = (animTime >= 12.7 && animTime <= 13.0);
-  const isPDVClicked = (animTime >= 4.2 && animTime < 4.5);
-  const isEstoqueClicked = (animTime >= 8.7 && animTime < 9.0);
+  const isDashboardClicked = false;
+  const isPDVClicked = (animTime >= 2.8 && animTime < 3.0);
+  const isEstoqueClicked = false;
   
-  const isSubmitClicked = (animTime >= 7.0 && animTime < 7.5);
+  const isSubmitClicked = (animTime >= 6.0 && animTime < 6.4);
+
+  // Dynamic values for simulation
+  const faturamentoVal = animTime >= 6.5 ? 'R$ 6.190,00' : 'R$ 4.890,00';
+  const vendasVal = animTime >= 6.5 ? '13 pedidos' : '12 pedidos';
+  const ticketVal = animTime >= 6.5 ? 'R$ 476,15' : 'R$ 407,50';
+  const metaVal = animTime >= 6.5 ? 6190 : 4890;
+  const metaPct = Math.round((metaVal / 8000) * 100);
+  const pixVal = animTime >= 6.5 ? 4190 : 2890;
+  const cartaoVal = 2000;
+  const pixPct = Math.round((pixVal / (pixVal + cartaoVal)) * 100);
+  const cartaoPct = 100 - pixPct;
 
   const plans = [
     {
@@ -183,6 +174,14 @@ export default function LandingPage() {
         .animate-fade-in-quick {
           animation: mockFadeIn 0.15s ease-out forwards;
         }
+        @keyframes emeraldFlash {
+          0% { background-color: rgb(240, 253, 250); border-color: rgb(16, 185, 129); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+          50% { background-color: rgb(209, 250, 229); border-color: rgb(16, 185, 129); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3); }
+          100% { background-color: white; border-color: rgb(244, 244, 245); box-shadow: none; }
+        }
+        .animate-emerald-flash {
+          animation: emeraldFlash 1.5s ease-out forwards;
+        }
       `}} />
       
       {/* 1. Header/Navbar */}
@@ -191,10 +190,12 @@ export default function LandingPage() {
           
           {/* Logo (Left) */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-zinc-955 flex items-center justify-center text-white font-black text-sm shadow-md transition-transform group-hover:scale-105">
-              K
+            <div className="text-zinc-900 transition-transform group-hover:scale-105 flex items-center justify-center">
+              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 2h4v8.5l9.5-9.5h5.5L12 12l11 10h-5.5L8 12.5V22H4V2z" />
+              </svg>
             </div>
-            <span className="font-extrabold tracking-tight text-sm text-zinc-900">
+            <span className="font-bold tracking-tight text-sm text-zinc-900">
               Kicks PDV
             </span>
           </Link>
@@ -294,8 +295,12 @@ export default function LandingPage() {
               <div className="w-44 bg-zinc-955 text-zinc-400 border-r border-zinc-900 p-4 flex flex-col justify-between hidden md:flex text-left">
                 <div className="space-y-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-zinc-955 font-black text-xs">K</div>
-                    <span className="font-extrabold text-[11px] text-white tracking-tight">Kicks PDV</span>
+                    <div className="text-white">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 2h4v8.5l9.5-9.5h5.5L12 12l11 10h-5.5L8 12.5V22H4V2z" />
+                      </svg>
+                    </div>
+                    <span className="font-bold text-[11px] text-white tracking-tight">Kicks PDV</span>
                   </div>
                   <div className="space-y-1">
                     <div className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
@@ -359,16 +364,24 @@ export default function LandingPage() {
                           <span className="px-1.5 py-0.5 bg-white text-zinc-900 shadow-xs rounded">7 Dias</span>
                           <span className="px-1.5 py-0.5">30 Dias</span>
                         </div>
-                        <button className="flex items-center gap-1 text-[8px] px-2 py-1 rounded bg-white border border-zinc-200 text-zinc-550 font-semibold shadow-xs">
+                        <button className="flex items-center gap-1 text-[8px] px-2 py-1 rounded bg-white border border-zinc-200 text-zinc-700 font-semibold shadow-sm">
                           <Download className="w-2.5 h-2.5" />
                           <span>Exportar .XLSX</span>
+                        </button>
+                        <button className="flex items-center gap-1 text-[8px] px-2 py-1 rounded bg-zinc-900 text-white font-bold hover:bg-zinc-800 shadow-sm transition-all duration-150">
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>+ Nova Venda</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Cards Grid */}
                     <div className="grid grid-cols-4 gap-3 my-3">
-                      <div className="p-3 bg-white border border-zinc-100 rounded-xl shadow-xs flex flex-col justify-between h-20">
+                      <div className={`p-3 rounded-xl shadow-xs flex flex-col justify-between h-20 transition-all duration-300 ${
+                        (animTime >= 6.5 && animTime < 8.2) 
+                          ? 'animate-emerald-flash border border-emerald-400' 
+                          : 'bg-white border border-zinc-100'
+                      }`}>
                         <div className="flex justify-between items-center">
                           <span className="text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">Faturamento</span>
                           <div className="p-1 rounded bg-emerald-50 text-emerald-550 border border-emerald-100/30">
@@ -376,7 +389,7 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 45.680,00</h3>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">{faturamentoVal}</h3>
                           <p className="text-[7px] text-zinc-455 mt-1 flex items-center gap-0.5">
                             <TrendingUp className="w-2.5 h-2.5 text-emerald-500" />
                             <span className="text-emerald-550 font-semibold">Receita consolidada</span>
@@ -387,12 +400,12 @@ export default function LandingPage() {
                       <div className="p-3 bg-white border border-zinc-100 rounded-xl shadow-xs flex flex-col justify-between h-20">
                         <div className="flex justify-between items-center">
                           <span className="text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">Vendas</span>
-                          <div className="p-1 rounded bg-blue-50 text-blue-505 border border-blue-100/30">
+                          <div className="p-1 rounded bg-blue-50 text-blue-555 border border-blue-100/30">
                             <ShoppingBag className="w-3 h-3" />
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">64 pedidos</h3>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">{vendasVal}</h3>
                           <p className="text-[7px] text-zinc-455 mt-1">Transações efetuadas</p>
                         </div>
                       </div>
@@ -405,7 +418,7 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 713,75</h3>
+                          <h3 className="text-sm font-black text-zinc-955 leading-none">{ticketVal}</h3>
                           <p className="text-[7px] text-zinc-455 mt-1">Média por transação</p>
                         </div>
                       </div>
@@ -413,20 +426,20 @@ export default function LandingPage() {
                       <div className="p-3 bg-white border border-zinc-100 rounded-xl shadow-xs flex flex-col justify-between h-20">
                         <div className="flex justify-between items-center">
                           <span className="text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">Meta Diária</span>
-                          <div className="p-1 rounded bg-amber-50 text-amber-505 border border-amber-100/30">
+                          <div className="p-1 rounded bg-amber-50 text-amber-555 border border-amber-100/30">
                             <Target className="w-3 h-3" />
                           </div>
                         </div>
                         <div className="mt-1">
                           <div className="flex items-baseline justify-between">
-                            <h3 className="text-sm font-black text-zinc-955 leading-none">R$ 45.680,00</h3>
-                            <span className="text-[6.5px] text-zinc-450">meta: R$ 40.000</span>
+                            <h3 className="text-sm font-black text-zinc-955 leading-none">{faturamentoVal}</h3>
+                            <span className="text-[6.5px] text-zinc-450">meta: R$ 8.000</span>
                           </div>
                           <div className="w-full bg-zinc-100 h-1 rounded-full mt-1.5 overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-amber-400 to-amber-550 rounded-full w-full" />
+                            <div className="h-full bg-gradient-to-r from-amber-400 to-amber-550 rounded-full" style={{ width: `${metaPct}%` }} />
                           </div>
-                          <p className="text-[6.5px] text-emerald-500 font-semibold mt-1 flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5" /> Meta atingida!
+                          <p className="text-[6.5px] text-zinc-500 font-semibold mt-1 flex items-center gap-0.5">
+                            <Sparkles className="w-2.5 h-2.5 text-zinc-400" /> Faltam R$ {Math.max(0, 8000 - metaVal)}
                           </p>
                         </div>
                       </div>
@@ -438,7 +451,7 @@ export default function LandingPage() {
                         <div>
                           <span className="text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">Receita nos últimos 7 dias</span>
                           <div className="flex items-end justify-between h-20 pt-2">
-                            {[10, 25, 15, 40, 20, 60, 100].map((h, i) => (
+                            {[10, 25, 15, 40, 20, 60, animTime >= 6.5 ? 95 : 75].map((h, i) => (
                               <div key={i} className="flex flex-col items-center gap-1 flex-1">
                                 <div className="w-4 bg-zinc-900 rounded-t-xs hover:bg-zinc-850 transition-colors duration-150" style={{ height: `${h}%` }} />
                                 <span className="text-[6.5px] font-bold text-zinc-400">{['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'][i]}</span>
@@ -458,8 +471,8 @@ export default function LandingPage() {
                           <p className="text-[6.5px] text-zinc-450 mb-2">Proporção financeira por meio de pagamento no período.</p>
                           
                           <div className="h-2 w-full rounded-full bg-zinc-100 overflow-hidden flex mb-2">
-                            <div className="h-full bg-emerald-500" style={{ width: '63%' }} />
-                            <div className="h-full bg-blue-500" style={{ width: '37%' }} />
+                            <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${pixPct}%` }} />
+                            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${cartaoPct}%` }} />
                           </div>
 
                           <div className="space-y-1">
@@ -468,14 +481,14 @@ export default function LandingPage() {
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 <span>PIX</span>
                               </div>
-                              <span className="font-semibold text-zinc-800">R$ 28.778,40 (63%)</span>
+                              <span className="font-semibold text-zinc-800">R$ {pixVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({pixPct}%)</span>
                             </div>
                             <div className="flex items-center justify-between text-[7px]">
                               <div className="flex items-center gap-1 text-zinc-555">
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 <span>Cartão</span>
                               </div>
-                              <span className="font-semibold text-zinc-800">R$ 16.901,60 (37%)</span>
+                              <span className="font-semibold text-zinc-800">R$ {cartaoVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({cartaoPct}%)</span>
                             </div>
                             <div className="flex items-center justify-between text-[7px]">
                               <div className="flex items-center gap-1 text-zinc-550">
@@ -556,7 +569,7 @@ export default function LandingPage() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <span className="text-zinc-500 font-medium">1x</span>
-                                <span className="font-bold text-zinc-900">R$ 750</span>
+                                <span className="font-bold text-zinc-900">R$ 800</span>
                               </div>
                             </div>
                             <div className="flex items-center justify-between text-[7.5px] bg-white p-1.5 rounded-md border border-zinc-100 shadow-xs">
@@ -566,7 +579,7 @@ export default function LandingPage() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <span className="text-zinc-500 font-medium">1x</span>
-                                <span className="font-bold text-zinc-900">R$ 450</span>
+                                <span className="font-bold text-zinc-900">R$ 500</span>
                               </div>
                             </div>
                           </div>
@@ -600,7 +613,7 @@ export default function LandingPage() {
                                   key={i} 
                                   className={`py-1 text-[7px] font-extrabold rounded-md text-center border block select-none ${
                                     meth === 'Pix' 
-                                      ? 'bg-zinc-950 text-white border-zinc-955 font-black' 
+                                      ? 'bg-zinc-955 text-white border-zinc-955 font-black' 
                                       : 'bg-white text-zinc-500 border-zinc-150'
                                   }`}
                                 >
@@ -615,7 +628,7 @@ export default function LandingPage() {
                           <div className="space-y-0.5 text-[7px] text-zinc-500">
                             <div className="flex justify-between font-medium">
                               <span>Subtotal</span>
-                              <span>R$ 1.200,00</span>
+                              <span>R$ 1.300,00</span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Desconto</span>
@@ -624,8 +637,9 @@ export default function LandingPage() {
                           </div>
                           <div className="flex justify-between items-end my-1">
                             <span className="text-[8px] font-bold text-zinc-900">Total</span>
-                            <span className="text-xs font-black text-zinc-955">R$ 1.200,00</span>
+                            <span className="text-xs font-black text-zinc-955">R$ 1.300,00</span>
                           </div>
+                        </div>
                           
                           <button 
                             className={`w-full py-1.5 rounded-lg text-[8px] font-bold text-center text-white select-none transition-all ${
@@ -639,8 +653,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {activeScreen === 'estoque' && (
                   <div className="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full animate-fade-in-quick">
@@ -1139,10 +1152,12 @@ export default function LandingPage() {
             {/* Column 1 (Brand info) */}
             <div className="col-span-2 space-y-4 text-left">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-zinc-950 flex items-center justify-center text-white font-black text-xs">
-                  K
+                <div className="text-zinc-900">
+                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 2h4v8.5l9.5-9.5h5.5L12 12l11 10h-5.5L8 12.5V22H4V2z" />
+                  </svg>
                 </div>
-                <span className="font-extrabold tracking-tight text-sm text-zinc-900">
+                <span className="font-bold tracking-tight text-sm text-zinc-900">
                   Kicks PDV
                 </span>
               </div>

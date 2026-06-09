@@ -144,10 +144,12 @@ export default function RegisterCheckoutPage() {
         
         {/* Logo */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-zinc-955 font-black text-lg shadow-xl shadow-white/5">
-            K
+          <div className="text-white">
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 2h4v8.5l9.5-9.5h5.5L12 12l11 10h-5.5L8 12.5V22H4V2z" />
+            </svg>
           </div>
-          <span className="font-extrabold tracking-tight text-base text-white">Kicks PDV</span>
+          <span className="font-bold tracking-tight text-base text-white">Kicks PDV</span>
         </div>
 
         {/* Text Area */}

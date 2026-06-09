@@ -82,8 +82,10 @@ export default function LoginPage() {
         {/* Header Section */}
         <a href="/" target="_blank" rel="noopener noreferrer" className="flex flex-col gap-3 text-center cursor-pointer hover:opacity-80 transition-opacity">
           {/* Minimalist Premium Logo */}
-          <div className="mx-auto w-10 h-10 rounded-xl bg-zinc-955 dark:bg-zinc-50 flex items-center justify-center text-white dark:text-zinc-955 font-black text-lg tracking-tight select-none">
-            K
+          <div className="mx-auto text-zinc-900 dark:text-white transition-transform flex items-center justify-center">
+            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 2h4v8.5l9.5-9.5h5.5L12 12l11 10h-5.5L8 12.5V22H4V2z" />
+            </svg>
           </div>
           <div className="mt-2 space-y-1">
             <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
